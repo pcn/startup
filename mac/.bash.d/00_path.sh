@@ -4,6 +4,13 @@
 
 if [ -z $PATH_SEEN ] ; then
     # Put /usr/local/bin and ~/bin before system defaults.
-    export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+    PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+    for dir in /opt/chef/bin ; do
+        if [ -d $dir ] ; then
+            PATH=$PATH:$dir
+        fi
+    done
+
+    export PATH
     export PATH_SEEN=true
 fi
