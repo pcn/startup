@@ -6,3 +6,4 @@ if [ $(which pyenv | wc -l) -eq 1 ] ; then
     # the following to the end of ~/.bash_profile:
     eval "$(pyenv init -)"
 fi
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
