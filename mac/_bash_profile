@@ -8,20 +8,29 @@ fi
 PS1='\h:\W \u\$ '
 # Make bash check its window size after a process completes
 shopt -s checkwinsize
-# Tell the terminal about the working directory at each prompt.
-if [ "$TERM_PROGRAM" == "Apple_Terminal" ] && [ -z "$INSIDE_EMACS" ]; then
-    update_terminal_cwd() {
-        # Identify the directory using a "file:" scheme URL,
-        # including the host name to disambiguate local vs.
-        # remote connections. Percent-escape spaces.
-	local SEARCH=' '
-	local REPLACE='%20'
-	local PWD_URL="file://$HOSTNAME${PWD//$SEARCH/$REPLACE}"
-	printf '\e]7;%s\a' "$PWD_URL"
-    }
-    PROMPT_COMMAND="update_terminal_cwd; $PROMPT_COMMAND"
-fi
 
+update_terminal_cwd() {
+    # Identify the directory using a "file:" scheme URL,
+    # including the host name to disambiguate local vs.
+    # remote connections. Percent-escape spaces.
+    printf '\e]7;%s\a' "$USER@$HOSTNAME:$PWD"
+}
+
+update_iterm2_cwd() {
+    printf "\033]0;$USER@$HOSTNAME:$PWD\007"
+}
+
+# Tell the terminal about the working directory at each prompt.
+if [ -z "$INSIDE_EMACS" ] ; then
+    case $TERM_PROGRAM in
+        "Apple_Terminal" )
+            PROMPT_COMMAND="update_terminal_cwd; $PROMPT_COMMAND"
+            ;;
+        "iTerm.app" )
+            PROMPT_COMMAND="update_iterm2_cwd; $PROMPT_COMMAND"
+            ;;
+    esac
+fi
 if [ -d ~/.bash.d -o -h ~/.bash.d ] ; then
     if [ $(ls ~/.bash.d/*.sh 2>/dev/null | wc -l) -gt 0 ] ; then
         for f in $(ls ~/.bash.d/*.sh) ; do
