@@ -34,7 +34,6 @@ fi
 if [ -d ~/.bash.d -o -h ~/.bash.d ] ; then
     if [ $(ls ~/.bash.d/*.sh 2>/dev/null | wc -l) -gt 0 ] ; then
         for f in $(ls ~/.bash.d/*.sh) ; do
-            echo "Sourcing $f"
             source $f
         done
     fi
