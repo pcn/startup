@@ -1,5 +1,9 @@
 # -*- bash -*-
 
+gshuf () {
+    shuf "$@"
+}
+
 ssh-add ~/.ssh/id_github
 # Uses a jq regex to select node/nodes
 function aal () {
@@ -31,7 +35,8 @@ function aag () {
     target=$1
 
     host=$(aal "$target" | jq -r ".[] | select(.Tags[].Key == \"Name\") | select (.Tags[].Value == \"$target\" ) | select (.State.Name == \"Running\") | .PrivateIpAddress")
-    nonstrictssh -i $AMAZON_SSH_KEY_FILE -l ubuntu $host
+    # nonstrictssh -i $AMAZON_SSH_KEY_FILE -l ubuntu $host
+    nonstrictssh -l ubuntu $host
 }
 
 function ashuf () {
@@ -44,7 +49,8 @@ function ashuf () {
         return 2
     fi
     host=$(aal "$match" | jq -r ".[] | select(.State.Name == \"running\") | select(.Tags[].Key == \"Name\") | select (.Tags[].Value | test(\"$match\") ) | .PrivateIpAddress" | gshuf -n 1)
-    nonstrictssh -i $AMAZON_SSH_KEY_FILE -l ubuntu $host "$@"
+    #  nonstrictssh -i $AMAZON_SSH_KEY_FILE -l ubuntu $host "$@"
+    nonstrictssh -l ubuntu $host "$@"
 }
 
 function nonstrictssh () {
@@ -52,16 +58,21 @@ function nonstrictssh () {
         AMAZON_SSH_KEY_FILE=~/.ssh/portal-keypair.pem
     elif [ "$AWSAM_ACTIVE_ACCOUNT" == "staging" ] ; then
         AMAZON_SSH_KEY_FILE=~/.ssh/portal-dev-keypair
-    else
-        echo "\$AMAZON_SSH_KEY_FILE isn't set" 1>&2
-        return 2
+    # else
+    #     echo "\$AMAZON_SSH_KEY_FILE isn't set" 1>&2
+    #     return 2
     fi
     echo "$@"
 
-    ssh -i $AMAZON_SSH_KEY_FILE \
-        -o StrictHostKeyChecking=no \
+    # ssh -i $AMAZON_SSH_KEY_FILE \
+    #     -o StrictHostKeyChecking=no \
+    #     -o UserKnownHostsFile=/dev/null \
+    #     "$@"
+
+    ssh -o StrictHostKeyChecking=no \
         -o UserKnownHostsFile=/dev/null \
         "$@"
+
 }
 
 function raws () {
@@ -81,3 +92,13 @@ function raws () {
         aws "$@"
     fi
 }
+
+
+# declare -x -f is a bash-ism
+declare -x -f gshuf
+declare -x -f aal
+declare -x -f aaname
+declare -x -f aag
+declare -x -f ashuf
+declare -x -f nonstrictssh
+declare -x -f raws
