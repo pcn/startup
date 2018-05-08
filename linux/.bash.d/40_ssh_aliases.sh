@@ -6,17 +6,17 @@ gshuf () {
 
 ssh-add ~/.ssh/id_github
 # Uses a jq regex to select node/nodes
-function aal () {
-    match="$1"
-    # list instances for ssh
-    jq --version >/dev/null 2>&1
-    RV=$?
-    if [ "$RV" != "0" ] ; then
-        echo "The jq tool isn't present" 1>&2
-        return 2
-    fi
-    raws "$match" ec2 describe-instances | jq "[.Reservations[].Instances | select(.[].Tags | length > 0) | select(.[].Tags[].Value | test(\"$match\") ) | select(.[].Tags[].Key == \"Name\") | {InstanceId: .[].InstanceId, PrivateIpAddress: .[].PrivateIpAddress, State: .[].State, LaunchTime: .[].LaunchTime, Tags: .[].Tags, AvailabilityZone: .[].Placement.AvailabilityZone, ImageId: .[].ImageId  }]"
-}
+# function aal () {
+#     match="$1"
+#     # list instances for ssh
+#     jq --version >/dev/null 2>&1
+#     RV=$?
+#     if [ "$RV" != "0" ] ; then
+#         echo "The jq tool isn't present" 1>&2
+#         return 2
+#     fi
+#     raws "$match" ec2 describe-instances | jq "[.Reservations[].Instances | select(.[].Tags | length > 0) | select(.[].Tags[].Value | test(\"$match\") ) | select(.[].Tags[].Key == \"Name\") | {InstanceId: .[].InstanceId, PrivateIpAddress: .[].PrivateIpAddress, State: .[].State, LaunchTime: .[].LaunchTime, Tags: .[].Tags, AvailabilityZone: .[].Placement.AvailabilityZone, ImageId: .[].ImageId  }]"
+# }
 
 function aaname () {
     match="$1"
@@ -39,19 +39,19 @@ function aag () {
     nonstrictssh -l ubuntu $host
 }
 
-function ashuf () {
-    match=$1
-    shift
-    gshuf --version 2>&1 > /dev/null
-    RV=$?
-    if [ "$RV" != "0" ] ; then
-        echo "The gshuf from gnu coreutils isn't present or active $(which gshuf)" 1>&2
-        return 2
-    fi
-    host=$(aal "$match" | jq -r ".[] | select(.State.Name == \"running\") | select(.Tags[].Key == \"Name\") | select (.Tags[].Value | test(\"$match\") ) | .PrivateIpAddress" | gshuf -n 1)
-    #  nonstrictssh -i $AMAZON_SSH_KEY_FILE -l ubuntu $host "$@"
-    nonstrictssh -l ubuntu $host "$@"
-}
+# function ashuf () {
+#     match=$1
+#     shift
+#     gshuf --version 2>&1 > /dev/null
+#     RV=$?
+#     if [ "$RV" != "0" ] ; then
+#         echo "The gshuf from gnu coreutils isn't present or active $(which gshuf)" 1>&2
+#         return 2
+#     fi
+#     host=$(aal "$match" | jq -r ".[] | select(.State.Name == \"running\") | select(.Tags[].Key == \"Name\") | select (.Tags[].Value | test(\"$match\") ) | .PrivateIpAddress" | gshuf -n 1)
+#     #  nonstrictssh -i $AMAZON_SSH_KEY_FILE -l ubuntu $host "$@"
+#     nonstrictssh -l ubuntu $host "$@"
+# }
 
 function nonstrictssh () {
     if [ "$AWSAM_ACTIVE_ACCOUNT" == "prod" ] ; then
@@ -96,9 +96,9 @@ function raws () {
 
 # declare -x -f is a bash-ism
 declare -x -f gshuf
-declare -x -f aal
+# declare -x -f aal
 declare -x -f aaname
 declare -x -f aag
-declare -x -f ashuf
+# declare -x -f ashuf
 declare -x -f nonstrictssh
 declare -x -f raws
