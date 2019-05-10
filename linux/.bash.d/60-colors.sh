@@ -1,11 +1,18 @@
 # Modified .bashrc to set colors based on the aws/other environment
 # we've initialized
 
+# Also enable aws completion
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
       *) return;;
 esac
+
+parse_git_branch() {
+    # Taken from https://coderwall.com/p/fasnya/add-git-branch-name-to-bash-prompt
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -41,18 +48,33 @@ fi
 if [ "$color_prompt" = yes ]; then
     # color for aws account
     case "$AWSAM_ACTIVE_ACCOUNT" in
+        "beacon-stg")
+            # PS1="\[\033[35;5;1m\]!staging!\[$(tput sgr0)\]\[\033[48;5;-1m\]\u@\w\\$\[$(tput sgr0)\]"
+            PS1='\[\033[35m\]|BS|\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(parse_git_branch)\[\033[00m\]\$ '
+            ;;
         "staging")
-            PS1='\[\033[35m|S|\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+            # PS1="\[\033[35;5;1m\]!staging!\[$(tput sgr0)\]\[\033[48;5;-1m\]\u@\w\\$\[$(tput sgr0)\]"
+            PS1='\[\033[35m\]|S|\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(parse_git_branch)\[\033[00m\]\$ '
+            ;;
+        "w8s")
+            # PS1="\[\033[35;5;1m\]!staging!\[$(tput sgr0)\]\[\033[48;5;-1m\]\u@\w\\$\[$(tput sgr0)\]"
+            PS1='\[\033[35m\]|w8s|\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(parse_git_branch)\[\033[00m\]\$ '
             ;;
         "production")
-            PS1='\[\033[31m|P|\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+            PS1='\[\033[31m\]|P|\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(parse_git_branch)\[\033[00m\]\$ '
+            ;;
+        "pptvol")
+            PS1='\[\033[31m\]|PPTVOL|\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(parse_git_branch)\[\033[00m\]\$ '
+            ;;
+        "sptvol")
+            PS1='\[\033[35m\]|SPTVOL|\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(parse_git_branch)\[\033[00m\]\$ '
             ;;
         "*")
-            PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+            PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(parse_git_branch)\[\033[00m\]\$ '
             ;;
     esac
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$(parse_git_branch)\$ '
 fi
 unset color_prompt force_color_prompt
 
@@ -110,3 +132,6 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# Add aws completion here too
+complete -C $(which aws_completer) aws
