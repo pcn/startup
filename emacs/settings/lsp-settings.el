@@ -31,16 +31,8 @@
 
 ;; ;; TODO: include lsp-ui?
 ;; (require 'lsp-mode)
-;; (require 'lsp-rust)
-(add-hook 'rust #'lsp-mode-deferred)
-(add-hook 'rust-mode-hook 'cargo-minor-mode)
-;; This and more from
-;; https://vxlabs.com/2018/11/19/configuring-emacs-lsp-mode-and-microsofts-visual-studio-code-python-language-server/
-(use-package lsp-python-ms
-  :ensure t
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-python-ms)
-                          (lsp-deferred))))  ; or lsp-deferred
+
+
 ;; lsp-mode
 ;; https://github.com/emacs-lsp/lsp-mode/blob/master/README.org#performance
 (setq gc-cons-threshold 100000000)

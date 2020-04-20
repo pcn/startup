@@ -34,6 +34,16 @@
 (add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
 
 
+;; This and more from
+;; https://vxlabs.com/2018/11/19/configuring-emacs-lsp-mode-and-microsofts-visual-studio-code-python-language-server/
+(use-package lsp-python-ms
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-python-ms)
+                          (lsp-deferred))))  ; or lsp-deferred
+
+
 ;; More flychecking from https://github.com/lunaryorn/.emacs.d/blob/master/lisp/flycheck-virtualenv.el
 
 (provide 'python-settings)
+;;; python-settings.el ends here

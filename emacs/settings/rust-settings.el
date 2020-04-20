@@ -20,5 +20,10 @@
 
 (use-package toml-mode)
 
+;; (require 'lsp-rust)
+(add-hook 'rust #'lsp-mode-deferred)
+(add-hook 'rust-mode-hook 'cargo-minor-mode)
+
+
 (provide 'rust-settings)
 ;;; rust-settings.el ends here
