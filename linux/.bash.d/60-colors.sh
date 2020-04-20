@@ -135,3 +135,4 @@ fi
 
 # Add aws completion here too
 complete -C $(which aws_completer) aws
+# ssh-add ~/.ssh/id_github

@@ -1,10 +1,9 @@
 # -*- bash -*-
 
-gshuf () {
-    shuf "$@"
-}
+# gshuf () {
+#     shuf "$@"
+# }
 
-ssh-add ~/.ssh/id_github
 # Uses a jq regex to select node/nodes
 # function aal () {
 #     match="$1"
@@ -95,10 +94,10 @@ function raws () {
 
 
 # declare -x -f is a bash-ism
-declare -x -f gshuf
+# declare -x -f gshuf  # don't need this anymore, not on a mac
 # declare -x -f aal
-declare -x -f aaname
-declare -x -f aag
+# declare -x -f aaname
+# declare -x -f aag
 # declare -x -f ashuf
 declare -x -f nonstrictssh
 declare -x -f raws
