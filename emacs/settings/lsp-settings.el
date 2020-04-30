@@ -19,10 +19,12 @@
 ;; Sideline just doesn't seem to DTRT for me.
 (setq lsp-ui-sideline-enable nil)
 ;; install LSP company backend for LSP-driven completion
-(use-package company-lsp
-  :ensure t
-  :config
-  (push 'company-lsp company-backends))
+;; (use-package company-lsp
+;;   :ensure t
+;;   :config
+;;   (push 'company-lsp company-backends))
+
+
 ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 ;; optionally if you want to use debugger

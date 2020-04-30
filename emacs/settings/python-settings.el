@@ -34,6 +34,7 @@
 (add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
 
 
+;; python-related LSP settings
 ;; This and more from
 ;; https://vxlabs.com/2018/11/19/configuring-emacs-lsp-mode-and-microsofts-visual-studio-code-python-language-server/
 (use-package lsp-python-ms
