@@ -14,7 +14,8 @@
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
 (use-package feature-mode
-  :init (load-library "org"))
+  :init (load-library "org")
+  :hook (fira-code-mode . feature-mode))
 
 
 

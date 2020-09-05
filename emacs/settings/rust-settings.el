@@ -26,7 +26,7 @@
 
 ;; It seems to be getting loaded somewhere else, so load it here so it can be removed from
 ;; auto-mode-aliast as long as I'm using rustic instead
-(use-package rust-mode)
+;; (use-package rust-mode)
 
 (use-package rustic
   :general

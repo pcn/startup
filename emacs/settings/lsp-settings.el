@@ -48,7 +48,7 @@
   :ensure t
   :commands lsp
   :config
-  (require 'lsp-clients)
+;;   (require 'lsp-clients)
   ;; change nil to 't to enable logging of packets between emacs and the LS
   ;; this was invaluable for debugging communication with the MS Python Language Server
   ;; and comparing this with what vs.code is doing
