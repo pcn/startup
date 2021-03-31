@@ -31,7 +31,7 @@
 (use-package rustic
   :general
   (:keymaps 'rustic-mode-map
-            "C-c r t" 'rustic-cargo-test-mode
+            "C-c r t" 'rustic-cargo-test
 ;;            "C-c r b" 'rust-build
             "C-c r r" 'rustic-cargo-test-run
             "C-c r l" 'pcn-cargo-test-file-local))

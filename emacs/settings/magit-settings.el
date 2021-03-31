@@ -13,12 +13,15 @@
 ;; The table handling needs org-mode to be loaded,
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
-(use-package feature-mode
+(use-package magit)
 ;;  :init (;;(load-library "org")
-  :hook fira-code-mode)
+
+(use-package forge
+  :after magit)
+(setq auth-sources '("~/.magit-forge-authinfo"))
 
 
 
-(provide 'feature-settings)
+(provide 'magit-settings)
 ;;; clojure-settings.el ends here
 

@@ -44,9 +44,7 @@
               (neotree-find file-name)))
       (message "Could not find git project root."))))
 (global-set-key (kbd "\C-c n t") 'neotree-show-project-dir)
-
-
-
+(setq neo-window-fixed-size nil)
 
 (provide 'neotree-settings)
 ;;; lsp-settings.el ends here

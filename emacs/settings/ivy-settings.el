@@ -14,9 +14,9 @@
 (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
 
 
-(use-package company-box
-  :hook (company-mode . company-box-mode)
-  :defer 0.5)
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode)
+;;   :defer 0.5)
 
 (use-package all-the-icons :defer 0.5)
 
@@ -37,16 +37,17 @@
 ;; (package! 'ivy-posframe t)  ;; Which I haven't implemented -PCN
 ;; I'm disabling this to see if it's interfering with how
 ;; lsp-ui is working
-(require 'ivy-posframe)
+;; (require 'ivy-posframe)
 ;; (setf (alist-get t ivy-posframe-display-functions-alist)
 ;;       'ivy-posframe-display-at-frame-bottom-left)
 ;; (setf (alist-get 'ivy-completion-in-region ivy-posframe-display-functions-alist)
 ;;       'ivy-posframe-display-at-point)
-(setq ivy-posframe-parameters '((left-fringe . 2)
-                                (right-fringe . 2)
-                                (internal-border-width . 1)))
-(setq ivy-posframe-width (frame-width))
-(ivy-posframe-mode 1)
+;; (setq ivy-posframe-parameters '((left-fringe . 2)
+;;                                 (right-fringe . 2)
+;;                                 (internal-border-width . 1)))
+;; (setq ivy-posframe-width (frame-width))
+;; (ivy-posframe-mode 1)
+
 (setq completion-in-region-function #'ivy-completion-in-region)
 
 ;; Referencing https://github.com/syl20bnr/spacemacs/issues/4207,

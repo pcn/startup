@@ -27,6 +27,12 @@
 ;; (defun flycheck-python-setup ()
 ;;   (flycheck-mode))
 
+;; Format with black to try not to think too hard about it
+(use-package python-black
+  :demand t
+  :after python)
+
+
 (add-hook 'python-mode-hook #'(lambda () (setq flycheck-checker 'python-pylint)))
 ;; enable
 (setq flycheck-python-pylint-executable "~/bin/pylint")
@@ -34,14 +40,22 @@
 (add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
 
 
+;; Directly from https://emacs-lsp.github.io/lsp-pyright/
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-momde . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp)))) ; or lsp-deferred?
+  
+
 ;; python-related LSP settings
 ;; This and more from
 ;; https://vxlabs.com/2018/11/19/configuring-emacs-lsp-mode-and-microsofts-visual-studio-code-python-language-server/
-(use-package lsp-python-ms
-  :ensure t
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-python-ms)
-                          (lsp-deferred))))  ; or lsp-deferred
+;; (use-package lsp-python-ms
+;;   :ensure t
+;;   :hook (python-mode . (lambda ()
+;;                           (require 'lsp-python-ms)
+;;                           (lsp-deferred))))  ; or lsp-deferred
 
 
 ;; More flychecking from https://github.com/lunaryorn/.emacs.d/blob/master/lisp/flycheck-virtualenv.el
