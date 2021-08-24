@@ -28,20 +28,48 @@
 ;; auto-mode-aliast as long as I'm using rustic instead
 ;; (use-package rust-mode)
 
+
+;; https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/#code-navigation
 (use-package rustic
+  :ensure
   :general
   (:keymaps 'rustic-mode-map
-            "C-c r t" 'rustic-cargo-test
-;;            "C-c r b" 'rust-build
-            "C-c r r" 'rustic-cargo-test-run
-            "C-c r l" 'pcn-cargo-test-file-local))
+            "M-j" 'lsp-ui-imenu
+            "M-?" 'lsp-find-references
+            ;; "C-c C-c l" 'flycheck-list-errors  ;; , use C-c ! l
+            "C-c C-c a" 'lsp-execute-code-action
+            "C-c C-c r" 'lsp-rename  ;; TODO: move this up to the development settings?
+            "C-c C-c q" 'lsp-workspace-restart    ;; TODO: move this to the development settings?
+            "C-c C-c Q" 'lsp-worksapce-shutdown  ;; TODO: move this to the development settings?
+            "C-c C-c s" 'lsp-rust-analyzer-status
+            "C-c C-c C-r" 'rustic-cargo-run  ;; Reverting to defaults - be explicit until next restart            
+            "C-c C-c C-t" nil
+            "C-c C-c C-t t" 'rustic-cargo-test  ;; Reverting to defaults - be explicit until next restart
+            "C-c C-c C-b"  'rustic-cargo-build ;; Reverting to defaults - be explicit until next restart
+            "C-c C-c C-t r" 'rustic-cargo-test-run
+            "C-c C-c C-t l" 'pcn-cargo-test-file-local)
+  :config
+  (setq rustic-format-on-save t)
+  (setq lsp-rust-analyzer-proc-macro-enable t)
+  :hook
+  (rustic-mode . smartparens-mode)
+  (rustic-mode . rk/rustic-mode-hook)
+  (rustic-mode . tree-sitter-hl-mode))
+
+(defun rk/rustic-mode-hook ()
+    ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+    ;; save rust buffers that are not file visiting. Once
+    ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+    ;; no longer be necessary.
+  (when buffer-file-name
+    (setq-local buffer-save-without-query t)))
 
 ;; Use this for cargo testing a particular module, so I can
 ;; set a local variable, e.g.
 ;; // -*- mode: rustic; cargo-test-less-arguments: "--test matrix"
 ;; for e.g.
 (defun pcn-cargo-test-file-local ()
-  "Run 'cargo test' via rustic-crag-test-run with the buffer-local `cargo-test-arguments' variable.
+  "Run 'cargo test' via rustic-cargo-test-run with the buffer-local `cargo-test-arguments' variable.
 The intent is to place e.g. this at the top of the file: // -*- mode: rustic; cargo-test-arguments: \"--test matrix\" -*-
 or the equivalent at the end of the file"
   (interactive)
