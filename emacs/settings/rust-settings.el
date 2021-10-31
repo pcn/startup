@@ -49,12 +49,23 @@
             "C-c C-c C-t r" 'rustic-cargo-test-run
             "C-c C-c C-t l" 'pcn-cargo-test-file-local)
   :config
-  (setq rustic-format-on-save t)
+  ;; (setq rustic-format-on-save t)
+  (setq rustic-lsp-format t)
   (setq lsp-rust-analyzer-proc-macro-enable t)
+  (setq rustic-format-trigger 'on-save)
   :hook
   (rustic-mode . smartparens-mode)
   (rustic-mode . rk/rustic-mode-hook)
-  (rustic-mode . tree-sitter-hl-mode))
+  (rustic-mode . tree-sitter-hl-mode)
+  ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?
+  )
+
+
+;; inline-docs, aka rustdoc-to-org
+;; https://github.com/brotzeit/rustic#inline-documentation
+(use-package helm-ag
+  :ensure t)
+
 
 (defun rk/rustic-mode-hook ()
     ;; so that run C-c C-c C-r works without having to confirm, but don't try to

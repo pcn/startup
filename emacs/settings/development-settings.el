@@ -40,7 +40,10 @@
 
 
 ;; optionally if you want to use debugger
-;; (use-package dap-mode)
+(use-package dap-mode
+  :ensure t )
+
+
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
 ;; ;; TODO: include lsp-ui?
@@ -176,26 +179,38 @@
   :ensure
   :init (exec-path-from-shell-initialize))
 
-(when (executable-find "lldb-mi")
+;; Originally relied on lldb-mi, but that appears to no
+;; longer be shipped as part of llvm, so, well, what to do?
+(when (executable-find "rust-gdb")
   (use-package dap-mode
     :ensure
     :config
-    (dap-ui-mode)
+    (dap-ui-mode 1)
+    (dap-tooltip-mode 1)
+    (tooltip-mode 1)
     (dap-ui-controls-mode 1)
 
     (require 'dap-lldb)
     (require 'dap-gdb-lldb)
     ;; installs .extension/vscode
     (dap-gdb-lldb-setup)
-    (dap-register-debug-template
-     "Rust::LLDB Run Configuration"
-     (list :type "lldb"
-           :request "launch"
-           :name "LLDB::Run"
-           :gdbpath "rust-lldb"
-           ;; uncomment if lldb-mi is not in PATH
-           ;; :lldbmipath "path/to/lldb-mi"
-           ))))
+    (dap-register-debug-template "Rust::GDB Run Configuration"
+                             (list :type "gdb"
+                                   :request "launch"
+                                   :name "GDB::Run"
+                           :gdbpath "rust-gdb"
+                                   :target nil
+                                   :cwd nil))
+    ;; (dap-register-debug-template
+    ;;  "Rust::LLDB Run Configuration"
+    ;;  (list :type "lldb"
+    ;;        :request "launch"
+    ;;        :name "LLDB::Run"
+    ;;        :gdbpath "rust-lldb"
+    ;;        ;; uncomment if lldb-mi is not in PATH
+    ;;        ;; :lldbmipath "path/to/lldb-mi"
+    ;;        ))
+    ))
 
 ;; Nicer blame mode
 (use-package mo-git-blame
