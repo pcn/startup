@@ -12,6 +12,8 @@
 
 ;;; Code:
 ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+(use-package projectile :ensure t)
+(use-package counsel :ensure t)
 (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
 
 (use-package marginalia :ensure t)  ;; Does this play nicely with ivy/swiper?
@@ -135,16 +137,14 @@
   (text-mode-hook . yas-minor-mode))
 
 (use-package company
-  :ensure
-  :bind
-  (:map company-active-map
-        ("C-n". company-select-next)
-        ("C-p". company-select-previous)
-        ("M-<". company-select-first)
-        ("M->". company-select-last)))
-  ;; (:map company-mode-map
-  ;;       ("<tab>". tab-indent-or-complete)
-  ;;       ("TAB". tab-indent-or-complete)))
+  :ensure t)
+;;   :bind
+;;  (add-hook 'after-init-hook 'global-company-mode))
+  ;; (:map company-active-map
+  ;;       ("C-n". company-select-next)
+  ;;       ("C-p". company-select-previous)
+  ;;       ("M-<". company-select-first)
+  ;;       ("M->". company-select-last)))
 
 ;; Copying https://github.com/pcn/emacs-rust-config/blob/master/init.el
 (defun check-expansion ()

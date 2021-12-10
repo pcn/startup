@@ -13,12 +13,14 @@
 ;; The table handling needs org-mode to be loaded,
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
-(use-package magit)
+(use-package magit
+  :ensure t)
 ;;  :init (;;(load-library "org")
 
 (use-package forge
+  :ensure t
   :after magit)
-(setq auth-sources '("~/.magit-forge-authinfo"))
+(setq auth-sources '((expand-file-anme "~/.magit-forge-authinfo")))
 
 
 

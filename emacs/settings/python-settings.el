@@ -35,7 +35,7 @@
 
 (add-hook 'python-mode-hook #'(lambda () (setq flycheck-checker 'python-pylint)))
 ;; enable
-(setq flycheck-python-pylint-executable "~/bin/pylint")
+(setq flycheck-python-pylint-executable (expand-file-name "~/bin/pylint"))
 (add-to-list 'flycheck-disabled-checkers 'python-flake8)
 (add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
 

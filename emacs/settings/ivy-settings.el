@@ -1,4 +1,7 @@
 ;; ivy 0.9.0 adds some cool stuff
+(use-package ivy
+  :ensure t)
+  
 (ivy-mode 1)
 (setq ivy-use-virtual-buffers t)(global-set-key "\C-s" 'swiper)
 ;; (global-set-key "\C-r" 'swiper)

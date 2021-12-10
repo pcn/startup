@@ -1,4 +1,4 @@
-if [ -d $HOME/.config/guix/current ]  ; then
+if [ -f $HOME/.config/guix/current/etc/profile ]  ; then
     GUIX_PROFILE=~/.config/guix/current
     . "$GUIX_PROFILE/etc/profile"
 else

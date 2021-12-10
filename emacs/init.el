@@ -17,6 +17,10 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+;; (add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
+
 (package-initialize)
 
 ;; https://jamiecollinson.com/blog/my-emacs-config/
@@ -35,10 +39,6 @@
 
 ;; Default to not using tabs at all
 (setq-default indent-tabs-mode nil)
-
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-;; (add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
 
 ;; Move the customizations into a file in the settings dir. I am not using the ".el" extension
 ;; because I tried to use parinfer-rust and that broke, so I don't want to try to use it again.
@@ -73,22 +73,39 @@
 (winner-mode 1)
 
 ;; TODO: move these to the development settings file, and use-package
+(use-package rainbow-delimiters
+  :ensure t)
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 
 
-(add-hook 'after-init-hook 'global-company-mode)
+;; (add-hook 'after-init-hook 'global-company-mode)
 
 ;; Always run terraform fmt from now on
-(add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)
+(use-package terraform-mode
+  :ensure t
+  :config
+  (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
+
+(use-package rg
+  :ensure t
+  :config
+  (rg-enable-menu))
 
 
 ;; High-dpi screen means long nyan bar
 
-(nlinum-mode)
+(use-package nlinum
+  :ensure t
+  :config
+  (nlinum-mode t))
 (use-package nyan-mode
+  :ensure t
   :init
   (setq nyan-animate-nyancat t)
-  (setq nyan-bar-length 30))
+  (setq nyan-bar-length 30)
+  (setq nyan-wavy-trail t)
+  :config
+  (nyan-mode))
 
 ;; Windmove allows for shift-arrow key moving around windows on the screen
 ;; (windmove-default-keybindings)
@@ -97,28 +114,63 @@
 (setq auto-revert-check-vc-info t)
 
 ;; Salt states mode
-(require 'mmm-auto)
-(setq mmm-global-mode 'auto)
-(add-to-list
- ;;; Something for saltstack,
- ;;; Though it would be worthwhile to look for the special python
- ;;; modes we use for some things
- 'auto-mode-alist '("\\.sls\\'" . yaml-mode))
-(mmm-add-mode-ext-class 'html-mode "\\.sls\\'" 'mako)
+;; (use-package 'mmm-auto
+;;   :ensure t)
+;; (setq mmm-global-mode 'auto)
+;; (add-to-list
+;;  ;;; Something for saltstack,
+;;  ;;; Though it would be worthwhile to look for the special python
+;;  ;;; modes we use for some things
+;;  'auto-mode-alist '("\\.sls\\'" . yaml-mode))
+;; (mmm-add-mode-ext-class 'html-mode "\\.sls\\'" 'mako)
+
+
+(use-package persp-projectile
+  :ensure t)
+  
+
+(use-package perspective
+  :ensure t
+  :init (persp-mode)
+  :config
+  ;; Let's try perspectives again.
+  ;; From https://medium.com/@cmacrae/emacs-making-neotree-work-with-perspectives-964638b5666e
+  (defun my/persp-neo ()
+    "Make neotree follow the perspective"
+    (interactive)
+    (let ((cw  (selected-window))
+          (path (buffer-file-name))) ;;; save current window/buffer
+      (progn
+        (when (and (fboundp 'projectile-project-p)
+                   (projectile-project-p)
+                   (fboundp 'projectile-project-root))
+          (neotree-dir (projectile-project-root)))
+        (neotree-find-path) ;; Should this be neotree-find? )
+      (select-window cw)))
+  :hook
+  (persp-switch . my/persp-neo)))
+
+;; Recommendation from the perspective page to reduce the
+;; amount of window-splitting
+(customize-set-variable 'display-buffer-base-action
+  '((display-buffer-reuse-window display-buffer-same-window)
+    (reusable-frames . t)))
+(customize-set-variable 'even-window-sizes nil)     ; avoid resizing
+
 
 
 ;; Just a note that using perspective/persp-mode handles keeping different window layouts
 ;; available
 ;; See https://github.com/nex3/perspective-el
-(use-package perspective
-  :config
-  (persp-mode)
-  (global-set-key (kbd "C-x C-b") (lambda (arg)
-                                  (interactive "P")
-                                  (if (fboundp 'persp-bs-show)
+;; (use-package perspective
+;;   :config
+;;   (persp-mode)
+;;   (global-set-key (kbd "C-x C-b") (lambda (arg)
+;;                                   (interactive "P")
+;;                                   (if (fboundp 'persp-bs-show)
 
-                                      1(persp-bs-show arg)
-                                    (bs-show "all")))))
+;;                                       1(persp-bs-show arg)
+;;                                     (bs-show "all")))))
 
 
 
@@ -130,18 +182,18 @@
 ;; pyenv support for working with salt, maybe others?
 ;; This is at the top so that e.g. aws can be found
 ;; when using kubernetes mode
-(use-package pyenv-mode-auto
-  :requires pyenv-mode)
-(use-package pyenv-mode)
+;; (use-package pyenv-mode-auto
+;;   :requires pyenv-mode)
+;; (use-package pyenv-mode)
 
-(defun projectile-pyenv-mode-set ()
-  "Set pyenv version matching project name."
-  (let ((project (projectile-project-name)))
-    (if (member project (pyenv-mode-versions))for
-        (pyenv-mode-set project)
-      (pyenv-mode-unset))))
+;; (defun projectile-pyenv-mode-set ()
+;;   "Set pyenv version matching project name."
+;;   (let ((project (projectile-project-name)))
+;;     (if (member project (pyenv-mode-versions))for
+;;         (pyenv-mode-set project)
+;;       (pyenv-mode-unset))))
 
-(add-hook 'projectile-switch-project-hook 'projectile-pyenv-mode-set)
+;; (add-hook 'projectile-switch-project-hook 'projectile-pyenv-mode-set)
 
 ;; More projectile configuration for neotree this time
 ;; from  https://www.emacswiki.org/emacs/NeoTree#h5o-8
@@ -150,6 +202,8 @@
 
 
 ;; flycheck with pycheckers to enable checking.
+(use-package flycheck
+  :ensure t)
 (global-flycheck-mode 1)
 (with-eval-after-load 'flycheck
       (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
@@ -178,10 +232,10 @@
 ;; can follow the local idiom of a book that I'm learning from.
 ;; Found at https://www.reddit.com/r/emacs/comments/57i41t/projectlocal_snippets/daw67dd/
 (setq crshd--default-yas-snippet-dirs
-      '("~/.emacs.d/snippets/"
+      '((expand-file-name "~/.emacs.d/snippets/")
         yas-installed-snippets-dir
-        "~/etc/emacs/layers/+completion/auto-completion/local/snippets"
-        "~/etc/spacemacs/snippets"))
+        (expand-file-name "~/etc/emacs/layers/+completion/auto-completion/local/snippets")
+        (expand-file-name "~/etc/spacemacs/snippets")))
 
 (defun crshd/set-projectile-yas-dir ()
   "Append a projectile-local YAS snippet dir to yas-snippet-dirs."
@@ -240,7 +294,7 @@
 
 
 ; "company" is auto-completion in-buffer for code, etc.
-(require 'company)
+;; (require 'company)
 ;; company-box to prettify company
 ;; (use-package company-box
 ;;   :hook (company-mode . company-box-mode))
@@ -251,7 +305,8 @@
 ;; Using i3wm means that I don't get my global default ssh-agent vars.
 ;; Enter https://emacs.stackexchange.com/questions/17866/magit-how-to-use-systems-ssh-agent-and-dont-ask-for-password
 ;; exec-path-from-shell
-(require 'exec-path-from-shell)
+(use-package exec-path-from-shell
+              :ensure t)
 (exec-path-from-shell-copy-env "SSH_AGENT_PID")
 (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
 
@@ -304,34 +359,42 @@
 
 ;; Load fira-mode from .emacs.d, which should be a symlink from a clone of the repo
 ;; Tell emacs where your personal elisp lib dir is
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-(add-to-list 'load-path "/home/spacey/emacs/27.1/share/emacs/27.1/lisp/org")
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/"))
+;; (add-to-list 'load-path "/home/spacey/emacs/27.1/share/emacs/27.1/lisp/org")
 ;; load the packaged named xyz.
 (load "fira-code") ;; best not to include the ending “.el” or “.elc”
 
-(load "git-timemachine")
+;; (load "git-timemachine")
 
-(load "smart-tab")
+(use-package smart-tab
+  :ensure t)
 
+;; I want general to do lazy binding of keys with use-package
+(use-package general
+  :ensure t)
 
-;; We want general to do lazy binding of keys with use-package
-(add-to-list 'load-path "~/.emacs.d/lisp/general.el")
-(require 'general)
+;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/general.el"))
+;; (require 'general)
 
-(require 'git-link)
-(require 'git-timemachine)
+(use-package git-link
+  :ensure t)
+(use-package git-timemachine
+  :ensure t)
 
-(use-package flatui-theme :ensure :defer)
-(use-package nyx-theme :ensure :defer)
-(use-package zenburn-theme :ensure :defer)
+;; (use-package flatui-theme :ensure :defer)
+;; (use-package nyx-theme :ensure :defer)
+;; (use-package zenburn-theme :ensure t :defer)
+(use-package afternoon-theme :ensure t :defer)
+(load-theme 'afternoon t)
+;; (add-hook 'after-init-hook (lambda () (load-theme 'afternoon)))
 
-;; Circadian switches themes at certain hours
-(use-package circadian
-  :ensure t
-  :config
-  (setq circadian-themes '(("6:00" . zenburn)
-                           ("16:30" . zenburn)))
-  (circadian-setup))
+;; ;; Circadian switches themes at certain hours
+;; (use-package circadian
+;;   :ensure t
+;;   :config
+;;   (setq circadian-themes '(("6:00" . zenburn)
+;;                            ("16:30" . zenburn)))
+;;   (circadian-setup))
 
 
 
@@ -439,7 +502,8 @@
 ;;   :config
 ;;   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
 
-(dumb-jump-mode)
+(use-package dumb-jump
+  :ensure t)
 
 (use-package eterm-256color
   :hook (term-mode . eterm-256color-mode))

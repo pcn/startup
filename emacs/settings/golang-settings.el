@@ -74,13 +74,14 @@
 ;; "projectile" recognizes git repos (etc) as "projects" and changes settings
 ;; as you switch between them. 
 ;; (projectile-global-mode 1)
+(use-package go-projectile
+  :ensure t)
 (projectile-mode 1)
-(require 'go-projectile)
 
 ; gotest defines a better set of error regexps for go tests, but it only
 ; enables them when using its own functions. Add them globally for use in
-(require 'compile)
-(require 'gotest)
+(use-package compile :ensure t)
+(use-package gotest  :ensure t)
 (dolist (elt go-test-compilation-error-regexp-alist-alist)
   (add-to-list 'compilation-error-regexp-alist-alist elt))
 (defun prepend-go-compilation-regexps ()
