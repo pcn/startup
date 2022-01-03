@@ -29,6 +29,13 @@
 ;; (use-package rust-mode)
 
 
+(use-package dap-mode
+  :ensure)
+
+(use-package dap-cppmode)
+
+(use-package dap-cpptools)
+
 ;; https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/#code-navigation
 (use-package rustic
   :ensure
@@ -57,6 +64,8 @@
   (rustic-mode . smartparens-mode)
   (rustic-mode . rk/rustic-mode-hook)
   (rustic-mode . tree-sitter-hl-mode)
+  (rustic-mode . dap-cppmode)
+  (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?
   )
 
