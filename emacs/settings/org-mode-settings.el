@@ -85,7 +85,7 @@ contains an ID, that ID will be replaced with a new one."
   :config
   (setq org-directory "~/Dropbox/Orgmode" )
   (setq org-return-follows-link t)
-  (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO"))))
+  (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO" "TOOLATE"))))
 
 ;; Also try to do org-roam for bidirectional links?
 

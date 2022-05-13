@@ -49,6 +49,7 @@
             "C-c C-c q" 'lsp-workspace-restart    ;; TODO: move this to the development settings?
             "C-c C-c Q" 'lsp-worksapce-shutdown  ;; TODO: move this to the development settings?
             "C-c C-c s" 'lsp-rust-analyzer-status
+            "C-c C-c e" 'lsp-rust-analyzer-open-external-docs ;; Open docs for function in a browser
             "C-c C-c C-r" 'rustic-cargo-run  ;; Reverting to defaults - be explicit until next restart            
             "C-c C-c C-t" nil
             "C-c C-c C-t t" 'rustic-cargo-test  ;; Reverting to defaults - be explicit until next restart

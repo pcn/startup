@@ -118,9 +118,11 @@
 ;; Number the candidates (use M-1, M-2 etc to select completions).
 
 (use-package lsp-ivy
+  :ensure t
   :after lsp)
 
 (use-package lsp-treemacs
+  :ensure t
   :after lsp)
 
 
@@ -214,6 +216,9 @@
 
 ;; Nicer blame mode
 (use-package mo-git-blame
+  :ensure t)
+
+(use-package restclient
   :ensure t)
 
 (provide 'development-settings)

@@ -362,7 +362,8 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/"))
 ;; (add-to-list 'load-path "/home/spacey/emacs/27.1/share/emacs/27.1/lisp/org")
 ;; load the packaged named xyz.
-(load "fira-code") ;; best not to include the ending “.el” or “.elc”
+(use-package fira-code)
+;; (load "fira-code") ;; best not to include the ending “.el” or “.elc”
 
 ;; (load "git-timemachine")
 
