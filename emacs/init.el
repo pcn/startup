@@ -125,6 +125,11 @@
 ;; (mmm-add-mode-ext-class 'html-mode "\\.sls\\'" 'mako)
 
 
+(use-package counsel-projectile
+  :ensure t
+  :config
+  (counsel-projectile-mode))
+
 (use-package persp-projectile
   :ensure t)
   

@@ -21,9 +21,9 @@
   ;; Prior is pgup, next is pgdown
   ("C-<prior>" . centaur-tabs-backward)
   ("C-<next>" . centaur-tabs-forward)
-  ("C-<tab>" . centaur-tabs-counsel-switch-group)
-  :init
-  (setq centaur-tabs-enable-key-bindings t) )
+  ("C-<tab>" . centaur-tabs-counsel-switch-group))
+  ;; :init
+  ;; (setq centaur-tabs-enable-key-bindings t) )
 
 
 (provide 'tab-settings)
