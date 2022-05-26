@@ -14,6 +14,8 @@
 
 ;; Test out neotree with projectile
 ;; From https://www.emacswiki.org/emacs/NeoTree#toc11
+(use-package neotree
+  :ensure t)
 (defun neotree-project-dir ()
   "Open NeoTree using the git root."
   (interactive)
@@ -28,7 +30,7 @@
       (message "Could not find git project root."))))
 
 
-(global-set-key [f8] 'neotree-project-dir)
+(global-set-key (kbd "\C-c n 8") 'neotree-project-dir)
 
 (defun neotree-show-project-dir ()
   "Open NeoTree using the git root, but don't close it."
