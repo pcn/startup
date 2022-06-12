@@ -57,17 +57,10 @@
  '(default ((t (:weight normal :width normal :family "FiraEmacs")))))
 
 
-;; TODO: an org-mode settings file 
-;; org-mode configuration based on
 ;; https://orgmode.org/worg/org-tutorials/org4beginners.html
 ;; Set to f if I want the splash screen for some reason.
 (setq inhibit-splash-screen t)
 (transient-mark-mode 1)
-;; Recommended by https://orgmode.org/manual/Activation.html
-(global-set-key (kbd "C-c o l") 'org-store-link)
-(global-set-key (kbd "C-c o a") 'org-agenda)
-(global-set-key (kbd "C-c o c") 'org-capture)
-
 
 ;;; Use C-c left/right to undo/redo window splits etc.
 (winner-mode 1)
@@ -262,50 +255,12 @@
 (setq show-paren-delay 0)
 (show-paren-mode)
 
-;; Parinfer-rust works with emacs with dynamic module support, which for me is only 27.1 and later.
-(use-package parinfer-rust-mode
-  :hook (;; (emacs-lisp-mode . parinfer-rust-mode) ;; parinfer seems to break when customize tries to add/change things
-         (clojure-mode . parinfer-rust-mode)))
-
-;; ;; Open a small shell side-window
-;; ;; From https://old.reddit.com/r/emacs/comments/9vk7iz/emacs_popup_shell/
-;; (defun gk-pop-shell (arg)
-;;   "Pop a shell in a side window, pass ARG to ‘shell’."
-;;   (interactive "P")
-;;   (select-window
-;;    (display-buffer-in-side-window
-;;     (save-window-excursion
-;;       (let ((prefix-arg arg))
-;;         (call-interactively #'shell))
-;;       (current-buffer))
-;;     '((side . bottom)))))
-
-;; (global-set-key (kbd "C-c ]") #'gk-pop-shell)
-;; (global-set-key (kbd "C-c [") #'window-toggle-side-windows)  ;; What's the correct type here?
-
 ;; Golang setup per https://github.com/cockroachdb/cockroach/wiki/Ben%27s-Go-Emacs-setup
-
-;; Do this in the wrapper script
-;; (append (concat (getenv "HOME") "/bin") exec-path)
-;; ;; pkg go installation
-;; (setq exec-path (append '("/home/spacey/bin" "home/spacey/go/bin") exec-path))
-;; (setenv "PATH" (concat (getenv "PATH") ":" (concat (getenv "HOME") "/bin") ":" (concat (getenv "HOME") "/go/bin")))
-
 
 ;; (setq exec-path '("/home/spacey/.cargo/bin" "/home/spacey/bin" "/opt/OpenPrinting-Gutenprint/sbin" "/opt/OpenPrinting-Gutenprint/bin" "/usr/local/sbin" "/usr/local/bin" "/usr/sbin" "/usr/bin" "/sbin" "/bin" "/usr/games" "/usr/local/games" "/snap/bin" "/home/spacey/bin" "/home/spacey/bin" "/home/spacey/.emacs.d/gotools/bin" "/home/spacey/bin" "/home/spacey/go/bin" "/home/spacey/bin" "/home/spacey/go/bin" "/home/spacey/bin" "/home/spacey/go/bin" "/usr/lib/emacs/25.2/x86_64-linux-gnu"))
 ; As-you-type error highlighting
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
 (setq-default indent-tabs-mode nil)
-
-
-; "company" is auto-completion in-buffer for code, etc.
-;; (require 'company)
-;; company-box to prettify company
-;; (use-package company-box
-;;   :hook (company-mode . company-box-mode))
-
-
-; end golang .emacs additions
 
 ;; Using i3wm means that I don't get my global default ssh-agent vars.
 ;; Enter https://emacs.stackexchange.com/questions/17866/magit-how-to-use-systems-ssh-agent-and-dont-ask-for-password
@@ -319,45 +274,6 @@
 ;; (global-set-key (kbd "M-o") 'ace-window)
 
 (server-start)
-
-;; Avoid fullscreen?
-;; This almost works. From https://askubuntu.com/questions/685082/ubuntu-14-04-emacs-how-to-revoke-the-fullscreen-default
-;; (defun toggle-fullscreen-x11 ()
-;;   "Toggle full screen on X11"
-;;   (interactive)
-;;   (when (eq window-system 'x)
-;;     (set-frame-parameter
-;;      nil 'fullscreen
-;;      (when (not (frame-parameter nil 'fullscreen)) 'fullboth))))
-
-
-;; (defun my:window-setup-hook ()
-;;   (toggle-fullscreen-x11)
-;;   (when window-system
-;;     (let* ((dconf-entry
-;;             (shell-command-to-string
-;;              "dconf read /com/ubuntu/user-interface/scale-factor"))
-;;            (scale-factor (progn (string-match "{'eDP1': \\([0-9]+\\)}"
-;;                                               dconf-entry)
-;;                                 (string-to-int (match-string 1 dconf-entry))))
-;;            ;; text-width make room for gutter and fringes
-;;            (text-width (truncate (/ 40 (/ scale-factor 8.0))))
-;;            (text-height (truncate (/ 30 (/ scale-factor 8.0)))))
-;;       (set-frame-size (selected-frame) text-width text-height))))
-;; (my:window-setup-hook)
-;; (setq window-setup-hook 'my:window-setup-hook)
-;; 
-;; https://old.reddit.com/r/emacs/comments/b0na5p/unfamous_great_emacs_package/
-;; - iedit: editing multiple occurrences of a symbol at the same time. I use it mainly for refactoring code.
-;;   https://github.com/tsdh/iedit
-;; - visuall-fill-column: cosmetics, it wraps lines at fill-column
-;;   https://github.com/joostkremers/visual-fill-column
-;; - nswbuff: quick, per-project buffer switching with C-TAB
-;;   https://github.com/joostkremers/nswbuff
-;; - symbol-overlay: highlights the symbol at point (and other occurrences of it in the buffer) and lets you jump back and forth between them
-;;   https://github.com/wolray/symbol-overlay
-;; - change-inner: quick editing of wrapped (in quotes, in brackets, etc.) content. See the repo for more detailed examples
-;;   https://github.com/magnars/change-inner.el
 
 (global-set-key (kbd "C-c <C-tab>") 'nswbuff-switch-to-previous-buffer)
 (global-set-key (kbd "C-c <C-iso-lefttab>") 'nswbuff-switch-to-next-buffer)
@@ -393,17 +309,6 @@
 (use-package afternoon-theme :ensure t :defer)
 (load-theme 'afternoon t)
 ;; (add-hook 'after-init-hook (lambda () (load-theme 'afternoon)))
-
-;; ;; Circadian switches themes at certain hours
-;; (use-package circadian
-;;   :ensure t
-;;   :config
-;;   (setq circadian-themes '(("6:00" . zenburn)
-;;                            ("16:30" . zenburn)))
-;;   (circadian-setup))
-
-
-
 
 ;; TODO: Change this to using the python-mode hooks in the python configuration
 (defun whitespace-sucks ()
@@ -514,22 +419,22 @@
 (use-package eterm-256color
   :hook (term-mode . eterm-256color-mode))
 
-;; popper to help with popup buffers, from https://github.com/karthink/popper
-(use-package popper
-  :ensure t ; or :straight t
-  :bind (("C-`"   . popper-toggle-latest)
-         ("M-`"   . popper-cycle)
-         ("C-M-`" . popper-toggle-type))
-  :init
-  (setq popper-reference-buffers
-        '("\\*Messages\\*"
-          "Output\\*$"
-          "\\*Async Shell Command\\*"
-          help-mode
-          compilation-mode))
-  (popper-mode +1)
-  (popper-echo-mode +1))  
-;; https://www.emacswiki.org/emacs/TrampMode
+;; ;; popper to help with popup buffers, from https://github.com/karthink/popper
+;; (use-package popper
+;;   :ensure t ; or :straight t
+;;   :bind (("C-`"   . popper-toggle-latest)
+;;          ("M-`"   . popper-cycle)
+;;          ("C-M-`" . popper-toggle-type))
+;;   :init
+;;   (setq popper-reference-buffers
+;;         '("\\*Messages\\*"
+;;           "Output\\*$"
+;;           "\\*Async Shell Command\\*"
+;;           help-mode
+;;           compilation-mode))
+;;   (popper-mode +1)
+;;   (popper-echo-mode +1))  
+;; ;; https://www.emacswiki.org/emacs/TrampMode
 ;; It says tramp is faster with ssh...
 (setq tramp-default-method "ssh")
 ;; Tramp actually has a sudo method. I don't even have words
@@ -540,8 +445,8 @@
 ;; I tried to use require with the load-path, above, but it really
 ;; really did not work. -PCN 20200420
 ;; Maybe use-package would work?
-;; (require 'rust-settings "~/.emacs.d/rust-settings.el")
-;; (require 'lsp-settings "~/.emacs.d/lsp-settings.el")
+(require 'rust-settings "~/.emacs.d/rust-settings.el")
+(require 'lsp-settings "~/.emacs.d/lsp-settings.el")
 (load "magit-settings")
 (load "neotree-settings")
 (load "development-settings")  ;; Lsp and dap first so other languages get its settings
@@ -554,5 +459,6 @@
 (load "tab-settings")
 (load "run-in-vterm.el")
 (load "org-mode-settings.el")
+(load "various-other-settings.el")  ;; Things I want moved out of init.el here
 (provide 'init)
-;;; init.el ends here
+;; init.el ends here

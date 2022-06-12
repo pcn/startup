@@ -77,11 +77,20 @@ contains an ID, that ID will be replaced with a new one."
         (kill-buffer buf)))))
 
 
+;; TODO: an org-mode settings file 
+;; org-mode configuration based on
+;; Recommended by https://orgmode.org/manual/Activation.html
+(global-set-key (kbd "C-c o l") 'org-store-link)
+(global-set-key (kbd "C-c o a") 'org-agenda)
+(global-set-key (kbd "C-c o c") 'org-capture)
+
 (use-package org
   :ensure
+  :after (counsel)  ;; leaning on counsel functions for indexes
   :general
   (:keymaps 'org-mode-map
-            "C-c n n" 'org-mactions-new-numbered-action)
+            "C-c n n" 'org-mactions-new-numbered-action
+            "C-c l l h" 'counsel-org-link) ;; work with IDs and links better, from https://zzamboni.org/post/how-to-easily-create-and-use-human-readable-ids-in-org-mode-and-doom-emacs/
   :config
   (setq org-directory "~/Dropbox/Orgmode" )
   (setq org-return-follows-link t)
@@ -91,6 +100,7 @@ contains an ID, that ID will be replaced with a new one."
 
 (use-package org-roam
   :ensure t
+  :after (org)
   :init
   ;; Avoid the v1->v2 upgrade messages
   (setq org-roam-v2-ack t)  
@@ -116,6 +126,7 @@ contains an ID, that ID will be replaced with a new one."
 
 (use-package org-super-agenda
   :ensure t
+  :after (org)
   :init
   (org-agenda-list))
 
@@ -180,6 +191,8 @@ contains an ID, that ID will be replaced with a new one."
                                  :todo ("SOMEDAY" )
                                  :order 90)
                           (:discard (:tag ("Chore" "Routine" "Daily")))))))))))
+
+
 
 
 (provide 'org-mode-settings)

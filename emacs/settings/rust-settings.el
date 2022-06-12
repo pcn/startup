@@ -30,7 +30,7 @@
 
 
 (use-package dap-mode
-  :ensure)
+  :ensure t)
 
 (use-package dap-cppmode)
 
