@@ -32,6 +32,9 @@
   :demand t
   :after python)
 
+;; (use-package smartparens-python
+;;   :demand t
+;;   :ensure t)
 
 (add-hook 'python-mode-hook #'(lambda () (setq flycheck-checker 'python-pylint)))
 ;; enable

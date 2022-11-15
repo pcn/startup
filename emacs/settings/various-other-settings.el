@@ -17,11 +17,17 @@
   :ensure t
   :bind
   ("C-x C-b" . persp-list-buffers)
+
   :custom
   (persp-mode-prefix-key (kbd "C-c M-p"))
+  (persp-suppress-no-prefix-key-warning to t)
   :init
   (persp-mode))
 
+(use-package auto-complete
+  :ensure t
+  :init
+  (ac-config-default))
 
 
 (provide 'various-other-settings)

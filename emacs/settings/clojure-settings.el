@@ -7,7 +7,9 @@
 
 ;;; Code:
 
-;; Parinfer-rust works with emacs with dynamic module support, which for me is only 27.1 and later.
+;; Parinfer-rust works with emacs with dynamic module support, which
+;; should be default for 27.1 and newer Note
+;; Need to install: clang, clang-dev
 (use-package parinfer-rust-mode
   :ensure t)
 

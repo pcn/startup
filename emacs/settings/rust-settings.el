@@ -62,11 +62,12 @@
   (setq lsp-rust-analyzer-proc-macro-enable t)
   (setq rustic-format-trigger 'on-save)
   :hook
-  (rustic-mode . smartparens-mode)
+  ;; (rustic-mode . smartparens-mode)
+  (rustic-mode . smartparens-strict-mode)
   (rustic-mode . rk/rustic-mode-hook)
   (rustic-mode . tree-sitter-hl-mode)
-  (rustic-mode . dap-cppmode)
-  (rustic-mode . dap-cpptools)
+  ;; (rustic-mode . dap-cppmode)
+  ;; (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?
   )
 

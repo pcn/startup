@@ -22,9 +22,11 @@
 ;; Based on https://www.wisdomandwonder.com/article/9897/use-package-smartparens-config-ensure-smartparens
 (use-package smartparens
   :ensure t
+  :init
+  ;; needs to be in init https://github.com/Fuco1/smartparens/issues/1088
+  (require 'smartparens-config)
   :config
   (smartparens-global-mode-enable-in-buffers)
-  (require 'smartparens-config)
   :general
   (:keymaps 'smartparens-mode-map
             "M-p s r" 'sp-forward-slurp-sexp
@@ -75,7 +77,11 @@
   ;; (setq lsp-ui-doc-max-height 8)
   ;; (setq lsp-ui-sideline-delay 2)
   (setq lsp-print-io nil)
-  (setq lsp-idle-delay 0.500))
+  (setq lsp-idle-delay 0.500)
+  :hook
+    (lsp-mode . (lambda () (auto-complete-mode -1))) ;; https://stackoverflow.com/questions/29169210/how-to-disable-global-minor-mode-in-a-specified-major-mode
+
+  )
 
 ;; Use the language server protocol module when possible
 ;; (with-eval-after-load 'lsp-mode
@@ -125,6 +131,8 @@
   :ensure t
   :after lsp)
 
+(use-package yasnippet-snippets
+  :ensure)
 
 (use-package yasnippet
   :ensure

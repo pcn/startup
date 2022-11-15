@@ -96,8 +96,15 @@ contains an ID, that ID will be replaced with a new one."
   (setq org-return-follows-link t)
   (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO" "TOOLATE"))))
 
-;; Also try to do org-roam for bidirectional links?
 
+(use-package emacsql
+  :ensure t)
+
+(use-package emacsql-sqlite
+  :ensure t)
+
+
+;; Also try to do org-roam for bidirectional links?
 (use-package org-roam
   :ensure t
   :after (org)

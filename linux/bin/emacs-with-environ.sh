@@ -1,16 +1,19 @@
 #!/bin/bash
-
+set -e -o pipefail
 # Run from .local/share/applications/emacs.desktop
 
 # For launching emacs after sourcing pyenv startup functions
 [ -f ~/.bash.d/30-pyenv.sh ] && . ~/.bash.d/30-pyenv.sh
-# [ -f ~/.bash.d/31-golang.sh  ] && . ~/.bash.d/31-golang.sh 
+[ -f ~/.bash.d/31-golang.sh  ] && . ~/.bash.d/31-golang.sh
 [ -f ~/.cargo/env ] && . ~/.cargo/env
 
-ssh-add ~/.ssh/id_rsa
-ssh-add ~/.ssh/id_github
+[ -f ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa
+[ -f ~/.ssh/id_github ] && ssh-add ~/.ssh/id_github
+[ -f ~/.ssh/id_ed25519 ] && ssh-add ~/.ssh/id_ed25519
+[ -f ~/.ssh/id_github_ed25519 ] && ssh-add ~/.ssh/id_github_ed25519
 
-export PATH=$PATH:$HOME/bin:$HOME/go/bin
+
+export PATH=$PATH:$HOME/bin:/usr/local/go/bin
 
 # set -x
 # export LD_LIBRARY_PATH=$(ls -1 $(find $(dirname $(dirname $(readlink  --canonicalize ~/bin/emacs))) -type d -name native-lisp ) | head -1)
@@ -19,7 +22,8 @@ export PATH=$PATH:$HOME/bin:$HOME/go/bin
 # exec $(readlink --canonicalize /home/spacey/bin/emacs) "$@" &
 
 export PATH="~/.guix-profile/bin:$PATH"
-export EMACSLOADPATH="~/.guix-profile/share/emacs/site-lisp"
+#  export EMACSLOADPATH="~/.guix-profile/share/emacs/site-lisp"
 export INFOPATH="~/.guix-profile/share/info"
 
+# exec emacs --init-directory=~/.emacs.d "$@"
 exec emacs "$@"

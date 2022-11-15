@@ -22,6 +22,10 @@
   :after magit)
 (setq auth-sources '((expand-file-anme "~/.magit-forge-authinfo")))
 
+;; For formatting commit messages with conventional-commit style
+;; (use-package conventional-commit
+;;   :hook
+;;   (git-commit-mode . conventional-commit-setup))
 
 
 (provide 'magit-settings)

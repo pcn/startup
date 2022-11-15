@@ -23,6 +23,7 @@
 
 (package-initialize)
 
+
 ;; https://jamiecollinson.com/blog/my-emacs-config/
 (unless (package-installed-p 'use-package)
     (package-refresh-contents)
@@ -79,6 +80,7 @@
   :config
   (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
 
+;; end
 (use-package rg
   :ensure t
   :config
@@ -154,8 +156,6 @@
   '((display-buffer-reuse-window display-buffer-same-window)
     (reusable-frames . t)))
 (customize-set-variable 'even-window-sizes nil)     ; avoid resizing
-
-
 
 ;; Just a note that using perspective/persp-mode handles keeping different window layouts
 ;; available
@@ -271,7 +271,9 @@
 (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
 
 ;; ace-window for making switching windows easier and faster
-;; (global-set-key (kbd "M-o") 'ace-window)
+(use-package ace-window
+  :ensure t)
+(global-set-key (kbd "M-o") 'ace-window)
 
 (server-start)
 
@@ -285,7 +287,6 @@
 ;; load the packaged named xyz.
 (use-package fira-code)
 ;; (load "fira-code") ;; best not to include the ending “.el” or “.elc”
-
 ;; (load "git-timemachine")
 
 (use-package smart-tab
@@ -316,9 +317,19 @@
   (interactive)
   (when (eq major-mode 'python-mode)
     (whitespace-cleanup)))
+
+(defun my-previous-window ()
+  "Select the previous window, the opposite of other-window"
+  (interactive)
+  (other-window -1))
+(global-set-key (kbd "C-M-x o") my-previous-window)
+
+
+;; https://emacs.stackexchange.com/questions/3458/how-to-switch-between-windows-quickly
+(windmove-default-keybindings 'meta)
+
+    
 (add-hook 'after-save-hook #'whitespace-sucks)
-
-
 ;; ;;; Treemacs config as of 2019-12-06
 ;; ;;; this is everything at the defaults from https://github.com/Alexander-Miller/treemacs
 ;; (use-package treemacs
@@ -445,8 +456,8 @@
 ;; I tried to use require with the load-path, above, but it really
 ;; really did not work. -PCN 20200420
 ;; Maybe use-package would work?
-(require 'rust-settings "~/.emacs.d/rust-settings.el")
-(require 'lsp-settings "~/.emacs.d/lsp-settings.el")
+;; (require 'rust-settings "~/.emacs.d/rust-settings.el")
+;; (require 'lsp-settings "~/.emacs.d/lsp-settings.el")
 (load "magit-settings")
 (load "neotree-settings")
 (load "development-settings")  ;; Lsp and dap first so other languages get its settings

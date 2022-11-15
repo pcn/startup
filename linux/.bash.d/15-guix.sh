@@ -1,6 +1,8 @@
 if [ -f $HOME/.config/guix/current/etc/profile ]  ; then
     GUIX_PROFILE=~/.config/guix/current
     . "$GUIX_PROFILE/etc/profile"
+    export GUIX_LOCPATH=$HOME/.guix-profile/lib/locale    
+    
 else
     cat <<EOF
 guix doesn't seem to be installed. Please follow the instructions at
