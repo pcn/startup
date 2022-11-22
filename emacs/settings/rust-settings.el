@@ -66,6 +66,7 @@
   (rustic-mode . smartparens-strict-mode)
   (rustic-mode . rk/rustic-mode-hook)
   (rustic-mode . tree-sitter-hl-mode)
+  (rustic-mode . fira-code-mode)
   ;; (rustic-mode . dap-cppmode)
   ;; (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?

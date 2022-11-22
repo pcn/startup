@@ -40,6 +40,7 @@
   (go-mode . my-go-compilation-hook)
   (go-mode . smartparens-mode)
   (go-mode . rainbow-delimiters-mode)
+  (go-mode . fira-code-mode)
   :general 
   (:keymaps 'go-mode-map
             "M-," 'compile

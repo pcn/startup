@@ -18,6 +18,8 @@
 
 (use-package marginalia :ensure t)  ;; Does this play nicely with ivy/swiper?
 
+(use-package minimap :ensure t) ;; show a smaller view of the file being visited
+
 ;; better smart parens than paredit, maybe?
 ;; Based on https://www.wisdomandwonder.com/article/9897/use-package-smartparens-config-ensure-smartparens
 (use-package smartparens

@@ -318,11 +318,11 @@
   (when (eq major-mode 'python-mode)
     (whitespace-cleanup)))
 
-(defun my-previous-window ()
-  "Select the previous window, the opposite of other-window"
-  (interactive)
-  (other-window -1))
-(global-set-key (kbd "C-M-x o") my-previous-window)
+;; (defun my-previous-window ()
+;;   "Select the previous window, the opposite of other-window"
+;;   (interactive)
+;;   (other-window -1))
+;; (global-set-key (kbd "C-M-x o") my-previous-window)
 
 
 ;; https://emacs.stackexchange.com/questions/3458/how-to-switch-between-windows-quickly
@@ -465,6 +465,7 @@
 (load "rust-settings")
 (load "python-settings")
 (load "clojure-settings")
+(load "typescript-settings")
 (load "golang-settings")
 (load "feature-settings")
 (load "tab-settings")
@@ -473,3 +474,4 @@
 (load "various-other-settings.el")  ;; Things I want moved out of init.el here
 (provide 'init)
 ;; init.el ends here
+(put 'narrow-to-region 'disabled nil)
