@@ -85,7 +85,7 @@ contains an ID, that ID will be replaced with a new one."
 (global-set-key (kbd "C-c o c") 'org-capture)
 
 (use-package org
-  :ensure
+  ;; :ensure
   :after (counsel)  ;; leaning on counsel functions for indexes
   :general
   (:keymaps 'org-mode-map
@@ -98,16 +98,17 @@ contains an ID, that ID will be replaced with a new one."
 
 
 (use-package emacsql
-  :ensure t)
+  ;; :ensure t
+  )
 
 (use-package emacsql-sqlite
-  :ensure t)
-
+  ;; :ensure t
+  )
 
 ;; Also try to do org-roam for bidirectional links?
 (use-package org-roam
-  :ensure t
-  :after (org)
+  ;; :ensure t
+  ;;:after (org)
   :init
   ;; Avoid the v1->v2 upgrade messages
   (setq org-roam-v2-ack t)  
@@ -132,7 +133,7 @@ contains an ID, that ID will be replaced with a new one."
   (require 'org-roam-protocol))
 
 (use-package org-super-agenda
-  :ensure t
+  ;; :ensure t
   :after (org)
   :init
   (org-agenda-list))

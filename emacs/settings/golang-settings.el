@@ -20,7 +20,7 @@
 
 (use-package go-mode
  :defer t
- :ensure t
+ ;; :ensure t
  :mode ("\\.go\\'" . go-mode)
  :init
   (setq compile-command "echo Building... && go build -v && echo Testing... && go test -v && echo Linter... && golint")
@@ -33,14 +33,15 @@
   
 ;;  (add-hook 'go-mode-hook 'custom-go-mode)
   :hook
-  (go-mode . compile)
+  ;; (go-mode . compile)
   (go-mode . gotest)
   (go-mode . lsp)
   (go-mode . my-go-mode-hook)
   (go-mode . my-go-compilation-hook)
   (go-mode . smartparens-mode)
   (go-mode . rainbow-delimiters-mode)
-  (go-mode . fira-code-mode)
+  ;; (go-mode . fira-code-mode)
+  (go-mode . subword-mode)
   :general 
   (:keymaps 'go-mode-map
             "M-," 'compile
@@ -76,19 +77,26 @@
 ;; as you switch between them. 
 ;; (projectile-global-mode 1)
 (use-package go-projectile
-  :ensure t)
-(projectile-mode 1)
+  ;; :ensure t
+  )
+
+(use-package projectile
+  (projectile-mode 1))
 
 ; gotest defines a better set of error regexps for go tests, but it only
 ; enables them when using its own functions. Add them globally for use in
-(use-package compile :ensure t)
-(use-package gotest  :ensure t)
+;; (use-package compile
+  ;; :ensure t
+;;   )
+(use-package gotest
+  ;; :ensure t
 (dolist (elt go-test-compilation-error-regexp-alist-alist)
   (add-to-list 'compilation-error-regexp-alist-alist elt))
 (defun prepend-go-compilation-regexps ()
   (dolist (elt (reverse go-test-compilation-error-regexp-alist))
     (add-to-list 'compilation-error-regexp-alist elt t)))
 (add-hook 'go-mode-hook 'prepend-go-compilation-regexps)
+)
 
 
 (provide 'golang-settings)

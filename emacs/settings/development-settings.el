@@ -12,18 +12,28 @@
 
 ;;; Code:
 ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-(use-package projectile :ensure t)
-(use-package counsel :ensure t)
-(use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+(use-package projectile
+  ;; :ensure t
+  )
+(use-package counsel
+  ;; :ensure t
+  )
+(use-package lsp-treemacs
+  ;; :ensure t
+  :commands lsp-treemacs-errors-list)
 
-(use-package marginalia :ensure t)  ;; Does this play nicely with ivy/swiper?
+(use-package marginalia
+  ;; :ensure t
+  )  ;; Does this play nicely with ivy/swiper?
 
-(use-package minimap :ensure t) ;; show a smaller view of the file being visited
+(use-package minimap
+  ;; :ensure t
+  ) ;; show a smaller view of the file being visited
 
 ;; better smart parens than paredit, maybe?
 ;; Based on https://www.wisdomandwonder.com/article/9897/use-package-smartparens-config-ensure-smartparens
 (use-package smartparens
-  :ensure t
+  ;; :ensure t
   :init
   ;; needs to be in init https://github.com/Fuco1/smartparens/issues/1088
   (require 'smartparens-config)
@@ -39,15 +49,19 @@
             "M-p p b" 'sp-backward-sexp ))
 
 (use-package tree-sitter
-  :ensure t)
+  ;; :ensure t
+  :init
+  (global-tree-sitter-mode))
 (use-package tree-sitter-langs
-  :ensure t)
+  ;; :ensure t
+  )
 
 
 
 ;; optionally if you want to use debugger
 (use-package dap-mode
-  :ensure t )
+  ;; :ensure t
+  )
 
 
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
@@ -68,7 +82,7 @@
 ;; Based on https://github.com/emacs-lsp/lsp-mode#use-package
 (use-package lsp-mode
 ;;  :init (setq lsp-keymap-prefix "C-c l")
-  :ensure t
+  ;; :ensure t
   :commands lsp
   :config
 ;;   (require 'lsp-clients)
@@ -93,7 +107,7 @@
 ;; Working off of
 ;; https://github.com/daviwil/emacs-from-scratch/blob/210e517353abf4ed669bc40d4c7daf0fabc10a5c/Emacs.org
 (use-package lsp-ui
-  :ensure t
+  ;; :ensure t
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-position 'bottom)
@@ -101,7 +115,9 @@
   (lsp-ui-sikdeline-show-hover t)
   (lsp-ui-doc-max-height 8))
 
-(use-package flycheck :ensure)
+(use-package flycheck
+  ;; :ensure t
+  )
 
 
 ;; (use-package lsp-ui
@@ -126,18 +142,19 @@
 ;; Number the candidates (use M-1, M-2 etc to select completions).
 
 (use-package lsp-ivy
-  :ensure t
+  ;; :ensure t
   :after lsp)
 
 (use-package lsp-treemacs
-  :ensure t
+  ;; :ensure t
   :after lsp)
 
 (use-package yasnippet-snippets
-  :ensure)
+  ;; :ensure t
+  )
 
 (use-package yasnippet
-  :ensure
+  ;; :ensure t
   :config
   (yas-reload-all)
   ;; (add-hook 'prog-mode-hook 'yas-minor-mode)
@@ -149,7 +166,8 @@
   (text-mode-hook . yas-minor-mode))
 
 (use-package company
-  :ensure t)
+  ;; :ensure t
+  )
 ;;   :bind
 ;;  (add-hook 'after-init-hook 'global-company-mode))
   ;; (:map company-active-map
@@ -172,6 +190,20 @@
   (let ((yas/fallback-behavior 'return-nil))
     (yas/expand)))
 
+;; Found this on reddit, to provide a yas snippet dir in local projectile projects
+;; https://www.reddit.com/r/emacs/comments/57i41t/projectlocal_snippets/
+(setq crshd--default-yas-snippet-dirs '("~/.emacs.d/snippets/"
+                                        yas-installed-snippets-dir ))
+
+(defun crshd/set-projectile-yas-dir ()
+  "Append a projectile-local YAS snippet dir to yas-snippet-dirs."
+  (interactive)
+  (let ((local-yas-dir (concat (projectile-project-root) ".snippets")))
+    (setq yas-snippet-dirs (cons local-yas-dir
+                                 crshd--default-yas-snippet-dirs))))
+
+(add-hook 'projectile-find-file-hook 'crshd/set-projectile-yas-dir)
+
 ;; (defun tab-indent-or-complete ()
 ;;   (interactive)
 ;;   (if (minibufferp)
@@ -188,14 +220,14 @@
 ;; setting up debugging support with dap-mode
 
 (use-package exec-path-from-shell
-  :ensure
+  ;; :ensure t
   :init (exec-path-from-shell-initialize))
 
 ;; Originally relied on lldb-mi, but that appears to no
 ;; longer be shipped as part of llvm, so, well, what to do?
 (when (executable-find "rust-gdb")
   (use-package dap-mode
-    :ensure
+    ;; :ensure t
     :config
     (dap-ui-mode 1)
     (dap-tooltip-mode 1)
@@ -226,10 +258,17 @@
 
 ;; Nicer blame mode
 (use-package mo-git-blame
-  :ensure t)
+  ;; :ensure t
+  )
 
 (use-package restclient
-  :ensure t)
+  ;; :ensure t
+  )
+
+(use-package fira-code-mode
+  ;; :ensure t
+  :custom (fira-code-mode-disabled-ligatures '("//" ":=" "==" ";;" "x" "[]" "++" "**")) ;; List of ligatures to turn off
+  :hook prog-mode) ;; Enables fira-code-mode automatically for programming major modes
 
 (provide 'development-settings)
 ;;; lsp-settings.el ends here

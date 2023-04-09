@@ -12,14 +12,15 @@
 ;; Need to install: clang, clang-dev
 ;; Why isn't this in the rust settings??
 (use-package parinfer-rust-mode
-  :ensure t)
+  ;; :ensure t
+  )
 
 ;;; typescript ide apparently? Similar to CIDER for clojure, I guess?
 (use-package tide
-  :ensure t
+  ;; :ensure t
   :hook 
   (typescript-mode . smartparens-strict-mode)
-  (typescript-mode . fira-code-mode)
+  ;; (typescript-mode . fira-code-mode)
 ;;  (typescript-mode . parinfer-rust-mode)
   :general
   (:keymaps 'typescript-mode-map

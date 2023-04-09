@@ -14,11 +14,12 @@
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
 (use-package magit
-  :ensure t)
+  ;; :ensure t
+  )
 ;;  :init (;;(load-library "org")
 
 (use-package forge
-  :ensure t
+  ;; :ensure t
   :after magit)
 (setq auth-sources '((expand-file-anme "~/.magit-forge-authinfo")))
 

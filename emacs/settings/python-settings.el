@@ -1,6 +1,12 @@
 ;; We can safely declare this function, since we'll only call it in Python Mode,
 ;; that is, when python.el was already loaded.a
 (declare-function python-shell-calculate-exec-path "python")
+
+;; I have no idea when or where this started, but as of this week this just started happening
+;; (2023-03-24). It seems like https://old.reddit.com/r/emacs/comments/ke3bs7/how_would_you_narrow_down_this_bug_in_pythonmode/
+;; is hitting me.
+(setq debug-on-error nil)
+
 ;; This may or may not be the right approach.  We also have  pyenv-mode-auto, and one or the other
 ;; should work.
 (defun flycheck-virtualenv-executable-find (executable)
@@ -39,13 +45,13 @@
 (add-hook 'python-mode-hook #'(lambda () (setq flycheck-checker 'python-pylint)))
 ;; enable
 (setq flycheck-python-pylint-executable (expand-file-name "~/bin/pylint"))
-(add-to-list 'flycheck-disabled-checkers 'python-flake8)
-(add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
+;; (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+;; (add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
 
 
 ;; Directly from https://emacs-lsp.github.io/lsp-pyright/
 (use-package lsp-pyright
-  :ensure t
+  ;; :ensure t
   :hook (python-momde . (lambda ()
                           (require 'lsp-pyright)
                           (lsp)))) ; or lsp-deferred?

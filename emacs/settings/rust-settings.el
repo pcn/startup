@@ -30,15 +30,15 @@
 
 
 (use-package dap-mode
-  :ensure t)
+  ;; :ensure t
+  )
 
-(use-package dap-cppmode)
-
-(use-package dap-cpptools)
+;; (use-package dap-cppmode)
+;; (use-package dap-cpptools)
 
 ;; https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/#code-navigation
 (use-package rustic
-  :ensure
+  ;; :ensure t
   :general
   (:keymaps 'rustic-mode-map
             "M-j" 'lsp-ui-imenu
@@ -66,7 +66,7 @@
   (rustic-mode . smartparens-strict-mode)
   (rustic-mode . rk/rustic-mode-hook)
   (rustic-mode . tree-sitter-hl-mode)
-  (rustic-mode . fira-code-mode)
+;;  (rustic-mode . fira-code-mode)
   ;; (rustic-mode . dap-cppmode)
   ;; (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?
@@ -76,10 +76,11 @@
 ;; inline-docs, aka rustdoc-to-org
 ;; https://github.com/brotzeit/rustic#inline-documentation
 (use-package helm-ag
-  :ensure t)
+  ;; :ensure t
+  )
 
 (use-package ron-mode
-  :ensure t
+  ;; :ensure t
   :hook
   (ron-mode . smartparens-mode))
 

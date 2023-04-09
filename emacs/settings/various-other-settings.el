@@ -14,7 +14,7 @@
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
 (use-package perspective
-  :ensure t
+  ;; :ensure t
   :bind
   ("C-x C-b" . persp-list-buffers)
 
@@ -25,10 +25,14 @@
   (persp-mode))
 
 (use-package auto-complete
-  :ensure t
+  ;; :ensure t
   :init
   (ac-config-default))
 
+(use-package whitespace-cleanup-mode
+  ;; :ensure t
+  )
+  
 
 (provide 'various-other-settings)
 ;;; clojure-settings.el ends here

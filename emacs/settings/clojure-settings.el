@@ -11,13 +11,14 @@
 ;; should be default for 27.1 and newer Note
 ;; Need to install: clang, clang-dev
 (use-package parinfer-rust-mode
-  :ensure t)
+  ;; :ensure t
+  )
 
 (use-package cider
-  :ensure t
+  ;; :ensure t
   :hook 
   (clojure-mode . smartparens-strict-mode)
-  (clojure-mode . fira-code-mode)
+  ;; (clojure-mode . fira-code-mode)
   (clojure-mode . parinfer-rust-mode)
   :general
   (:keymaps 'clojure-mode-map

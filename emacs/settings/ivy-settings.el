@@ -1,20 +1,24 @@
 ;; ivy 0.9.0 adds some cool stuff
 (use-package ivy
-  :ensure t)
+  ;; :ensure t
+  (ivy-mode 1)
   
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)(global-set-key "\C-s" 'swiper)
-;; (global-set-key "\C-r" 'swiper)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-c P") 'counsel-package)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "C-c r g") 'counsel-rg)
-(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  (setq ivy-use-virtual-buffers t)
+  )
 
-;; Don't use the default switch-to-buffer, use counsel's switch-to-buffer which provides a
-;; preview of buffers.
-(global-set-key (kbd "C-x b") 'counsel-switch-buffer)
+(global-set-key (kbd "C-s") 'swiper)
+;; (global-set-key "\C-r" 'swiper)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-c P") 'counsel-package)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "C-c r g") 'counsel-rg)
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+
+  ;; Don't use the default switch-to-buffer, use counsel's switch-to-buffer which provides a
+  ;; preview of buffers.
+  (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
+  
 
 
 ;; (use-package company-box
@@ -56,10 +60,12 @@
 ;; Referencing https://github.com/syl20bnr/spacemacs/issues/4207,
 ;; Maybe shell startup is killing me
 ;; (setq shell-file-name "/bin/sh")
-(projectile-mode +1)
-(setq projectile-enable-caching t)
-(projectile-global-mode)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+(use-package projectile-mode
+  (projectile-mode +1)
+  (setq projectile-enable-caching t)
+  (projectile-global-mode)
+  )
+(global-set-key (kbd "C-c p") 'projectile-command-map)
 
 (defun my-ivy-completing-read (&rest args)
   (let ((ivy-sort-functions-alist '((t . nil))))

@@ -14,8 +14,10 @@
 
 ;; Test out neotree with projectile
 ;; From https://www.emacswiki.org/emacs/NeoTree#toc11
+(use-package all-the-icons)
 (use-package neotree
-  :ensure t)
+  ;; :ensure t
+  )
 (defun neotree-project-dir ()
   "Open NeoTree using the git root."
   (interactive)

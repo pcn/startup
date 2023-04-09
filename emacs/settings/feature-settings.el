@@ -14,7 +14,7 @@
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
 (use-package feature-mode
-  :ensure t
+  ;; :ensure t
 ;;  :init (;;(load-library "org")
   ;;   :hook fira-code-mode) ;; This is wrong, this is changing the mode to feature mode when I load fira-code-mode
   
