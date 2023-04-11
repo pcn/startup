@@ -1,3 +1,11 @@
+;;; package --- Summary
+;;; the settings for ivy, projectile, swiper etc.
+
+;;; Commentary:
+;;; Non-default narrowing and project jumping pieces
+
+
+;;; Code:
 ;; ivy 0.9.0 adds some cool stuff
 (use-package ivy
   ;; :ensure t

@@ -1,6 +1,13 @@
 if [ -f $HOME/.config/guix/current/etc/profile ]  ; then
     GUIX_PROFILE=~/.config/guix/current
     . "$GUIX_PROFILE/etc/profile"
+    # pop-os has a bug with this symlink in my home dir:
+    # https://github.com/pop-os/shell/issues/1544
+    # it looks like that's just a default manifest, so I'm
+    # going to see if I can specify an alternative manifest,
+    # based on what I'm reading at
+    # https://guix.gnu.org/cookbook/en/html_node/Basic-setup-with-manifests.html
+    # and put it outside of my home dir to avoid pop-os breaking, hopefully
     export GUIX_LOCPATH=$HOME/.guix-profile/lib/locale    
     
 else

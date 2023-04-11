@@ -4,7 +4,8 @@ set -e -o pipefail
 
 # For launching emacs after sourcing pyenv startup functions
 [ -f ~/.bash.d/30-pyenv.sh ] && . ~/.bash.d/30-pyenv.sh
-[ -f ~/.bash.d/31-golang.sh  ] && . ~/.bash.d/31-golang.sh
+# [ -f ~/.bash.d/31-golang.sh  ] && . ~/.bash.d/31-golang.sh  # Use asdf instead
+[ -f ~/.bash.d/25-asdf.sh ] && . ~/.bash.d/25-asdf.sh
 [ -f ~/.cargo/env ] && . ~/.cargo/env
 
 [ -f ~/.ssh/id_rsa ] && ssh-add ~/.ssh/id_rsa

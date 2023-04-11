@@ -13,6 +13,11 @@
 ;; The table handling needs org-mode to be loaded,
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
+
+;; Projectile requires sqlite3, and I think magit does too. Anyway, install this
+;; here, it's a runtime requirement it doesn't prevent loading.
+(use-package sqlite3)
+
 (use-package magit
   ;; :ensure t
   )
