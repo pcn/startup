@@ -15,6 +15,7 @@
 
 ;; Instead of package try elpaca
 (setq package-enable-at-startup nil)
+
 (defvar elpaca-installer-version 0.3)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
@@ -70,7 +71,8 @@
 (load "magit-settings")
 (load "neotree-settings")
 (load "development-settings")  ;; Lsp and dap first so other languages get its settings
-(load "ivy-settings") ;; After development settings so that lsp-ivy works
+;; (load "ivy-settings") ;; After development settings so that lsp-ivy works
+(load "vertico-settings") 
 (load "rust-settings")
 (load "python-settings")
 (load "clojure-settings")

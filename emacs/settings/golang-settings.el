@@ -41,6 +41,7 @@
   (go-mode . smartparens-mode)
   (go-mode . rainbow-delimiters-mode)
   ;; (go-mode . fira-code-mode)
+  ;; (go-mode . (lambda () (fira-code-mode -1)))  ;; Would this work to disable the mode?
   (go-mode . subword-mode)
   :general 
   (:keymaps 'go-mode-map

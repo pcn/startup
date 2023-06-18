@@ -56,6 +56,38 @@
   ;; :ensure t
   )
 
+;; ;; use-package-hydra to allow hydras to be bound to
+;; ;; use-package
+;; (use-package use-package-hydra
+;;   :after hydra use-package)
+;; (elpaca-wait) ;; Or the hydra part of use-package will not work
+;; (use-package hydra)
+
+;; (use-package lsp-origami
+;;   :after origami)
+
+;; (use-package origami
+;;   :hook
+;;   (yaml-mode . origami-mode)
+;;   (go-mode . origami-mode)
+;;   :after use-package-hydra use-package
+;;   :bind ("C-c C-v" . hydra-origami/open-node)
+;;   :hydra
+;;   (hydra-origami (:color red)
+;;   "
+;;   _o_pen node    _n_ext fold       toggle _f_orward
+;;   _c_lose node   _p_revious fold   toggle _a_ll
+;;   "
+;;   ("o" origami-open-node)
+;;   ("c" origami-close-node)
+;;   ("n" origami-next-fold)
+;;   ("p" origami-previous-fold)
+;;   ("f" origami-forward-toggle-node)
+;;   ("a" origami-toggle-all-nodes))
+
+;;   )
+
+
 
 
 ;; optionally if you want to use debugger
@@ -95,9 +127,10 @@
   (setq lsp-print-io nil)
   (setq lsp-idle-delay 0.500)
   :hook
-    (lsp-mode . (lambda () (auto-complete-mode -1))) ;; https://stackoverflow.com/questions/29169210/how-to-disable-global-minor-mode-in-a-specified-major-mode
-
+  (lsp-mode . (lambda () (auto-complete-mode -1))) ;; https://stackoverflow.com/questions/29169210/how-to-disable-global-minor-mode-in-a-specified-major-mode
+  (lsp-after-open . lsp-origami-enable)
   )
+
 
 ;; Use the language server protocol module when possible
 ;; (with-eval-after-load 'lsp-mode
