@@ -41,7 +41,7 @@
      (330 . "#2492db")
      (360 . "#0a74b9")))
  '(vc-annotate-very-old-color "#0a74b9")
- '(warning-suppress-log-types '((comp) (use-package) (comp)))
+ '(warning-suppress-log-types '((emacs) (use-package) (comp)))
  '(warning-suppress-types '((use-package) (comp)))
  '(winner-mode t)
  '(yas-global-mode t)

@@ -34,6 +34,25 @@
 ;;   (git-commit-mode . conventional-commit-setup))
 
 
+;; Throw blamer.el in as well, since it's sort of git-related
+(use-package blamer
+  :bind (("s-i" . blamer-show-commit-info)
+         ("C-c i" . blamer-show-posframe-commit-info))
+  :defer 20
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-min-offset 70)
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                    :background nil
+                    :height 1.0
+                    :italic t
+                    )))
+  :config
+  (global-blamer-mode 1)
+  ;; (setq blamer-commit-formmater "%s")
+  )
+
 (provide 'magit-settings)
 ;;; clojure-settings.el ends here
 

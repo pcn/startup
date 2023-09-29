@@ -31,14 +31,19 @@
 
 (use-package dap-mode
   ;; :ensure t
+  ;; Enabling only some features
+  :init
+  (dap-cpptools +1)
   )
-
 ;; (use-package dap-cppmode)
 ;; (use-package dap-cpptools)
 
+;; (use-package rust-mode) ;; it's a dependency for rustic, and the way it's invoked by default is putting it higher
+;; on the auto-mode-alist I think
+
 ;; https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/#code-navigation
 (use-package rustic
-  ;; :ensure t
+  :mode ((rx ".rs" string-end) . rustic-mode)
   :general
   (:keymaps 'rustic-mode-map
             "M-j" 'lsp-ui-imenu
@@ -56,22 +61,24 @@
             "C-c C-c C-b"  'rustic-cargo-build ;; Reverting to defaults - be explicit until next restart
             "C-c C-c C-t r" 'rustic-cargo-test-run
             "C-c C-c C-t l" 'pcn-cargo-test-file-local)
+;;  :mode ("\\.rs?\\" . rustic)
   :config
-  ;; (setq rustic-format-on-save t)
+  ;; (setq rustic-format-on-save t)  ;; lsp should do this now
   (setq rustic-lsp-format t)
   (setq lsp-rust-analyzer-proc-macro-enable t)
   (setq rustic-format-trigger 'on-save)
   :hook
-  ;; (rustic-mode . smartparens-mode)
-  (rustic-mode . smartparens-strict-mode)
-  (rustic-mode . rk/rustic-mode-hook)
+  (rustic-mode . lsp-mode)
+  (rustic-mode . smartparens-mode)
+  ;; (rustic-mode . smartparens-strict-mode)
+  ;; (rustic-mode . rk/rustic-mode-hook)
   (rustic-mode . tree-sitter-hl-mode)
-;;  (rustic-mode . fira-code-mode)
-  ;; (rustic-mode . dap-cppmode)
+  ;; (rustic-mode . dap-cppmode)  ;; https://github.com/brotzeit/rustic/issues/86#issuecomment-860043715
   ;; (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?
+  :after (:all lsp-mode rustic)
   )
-
+(elpaca-wait)
 
 ;; inline-docs, aka rustdoc-to-org
 ;; https://github.com/brotzeit/rustic#inline-documentation
@@ -79,18 +86,20 @@
   ;; :ensure t
   )
 
+
+;; Rusty object notation. Why do I need this? 2023-09-28
 (use-package ron-mode
   ;; :ensure t
   :hook
   (ron-mode . smartparens-mode))
 
-(defun rk/rustic-mode-hook ()
-    ;; so that run C-c C-c C-r works without having to confirm, but don't try to
-    ;; save rust buffers that are not file visiting. Once
-    ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
-    ;; no longer be necessary.
-  (when buffer-file-name
-    (setq-local buffer-save-without-query t)))
+;; (defun rk/rustic-mode-hook ()
+;;     ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+;;     ;; save rust buffers that are not file visiting. Once
+;;     ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+;;     ;; no longer be necessary.
+;;   (when buffer-file-name
+;;     (setq-local buffer-save-without-query t)))
 
 ;; Use this for cargo testing a particular module, so I can
 ;; set a local variable, e.g.

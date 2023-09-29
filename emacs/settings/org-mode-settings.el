@@ -85,7 +85,6 @@ contains an ID, that ID will be replaced with a new one."
 (global-set-key (kbd "C-c o c") 'org-capture)
 
 (use-package org
-  ;; :ensure
   :after (counsel)  ;; leaning on counsel functions for indexes
   :general
   (:keymaps 'org-mode-map
@@ -97,13 +96,9 @@ contains an ID, that ID will be replaced with a new one."
   (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO" "TOOLATE"))))
 
 
-(use-package emacsql
-  ;; :ensure t
-  )
+(use-package emacsql)
 
-(use-package emacsql-sqlite
-  ;; :ensure t
-  )
+(use-package emacsql-sqlite )
 
 ;; Also try to do org-roam for bidirectional links?
 (use-package org-roam
@@ -132,11 +127,12 @@ contains an ID, that ID will be replaced with a new one."
   ;; If using org-roam-protocol
   (require 'org-roam-protocol))
 
-(use-package org-super-agenda
-  ;; :ensure t
-  :after (org)
-  :init
-  (org-agenda-list))
+;; This intereferes with rustic first intializing in a way that brings up the org agenda
+;; instead of the main rust file I'm trying to load up. Ick.
+;; (use-package org-super-agenda
+;;   :after (org)
+;;   :init
+;;   (org-agenda-list))
 
 
 (setq org-tag-alist '(("@work" . ?w) ("@home" . ?h) ("NETLIFY_RELIABILITY" .  ?r)))

@@ -29,16 +29,18 @@
 (setq custom-file (expand-file-name "~/.emacs.d/settings/custom-settings"))
 (add-hook 'elpaca-after-init-hook (lambda () (load custom-file)))
 
+
+;; Fira has become a pita; the glyphs it provides just don't seem to be useful 90% of the time
 ;; Note- set the fira font in ~/.fonts via instructions in
 ;; https://github.com/johnw42/fira-code-emacs/blob/master/fira-code.el
 ;; the use of the custom ligatures need to be activated via `fira-code-mode`
 ;; in individual buffers unless/until I make it automatic
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:weight normal :width normal :family "FiraEmacs")))))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(default ((t (:weight normal :width normal :family "FiraEmacs")))))
 
 
 ;; https://orgmode.org/worg/org-tutorials/org4beginners.html
@@ -48,6 +50,13 @@
 
 ;;; Use C-c left/right to undo/redo window splits etc.
 (winner-mode 1)
+
+;; I want general to do lazy binding of keys with use-package
+(use-package general :demand t
+  ;; :ensure t
+  )
+(elpaca-wait)  ;; general adds a keyword to use-package, so I want it to be loaded before I try to use it with use-package, I think
+
 
 ;; TODO: move these to the development settings file, and use-package
 (use-package rainbow-delimiters
@@ -114,33 +123,34 @@
   )
   
 
-(use-package perspective
-  ;; :ensure t
-  :init (persp-mode)
-  :config
-  ;; Let's try perspectives again.
-  ;; From https://medium.com/@cmacrae/emacs-making-neotree-work-with-perspectives-964638b5666e
-  (defun my/persp-neo ()
-    "Make neotree follow the perspective"
-    (interactive)
-    (let ((cw  (selected-window))
-          (path (buffer-file-name))) ;;; save current window/buffer
-      (progn
-        (when (and (fboundp 'projectile-project-p)
-                   (projectile-project-p)
-                   (fboundp 'projectile-project-root))
-          (neotree-dir (projectile-project-root)))
-        (neotree-find-path) ;; Should this be neotree-find? )
-      (select-window cw)))
-  :hook
-  (persp-switch . my/persp-neo)))
+;; (use-package perspective
+;;   ;; :ensure t
+;;   :init (persp-mode)
+;;   ;; :config
+;;   ;; ;; Let's try perspectives again.
+;;   ;; ;; From https://medium.com/@cmacrae/emacs-making-neotree-work-with-perspectives-964638b5666e
+;;   ;; (defun my/persp-neo ()
+;;   ;;   "Make neotree follow the perspective"
+;;   ;;   (interactive)
+;;   ;;   (let ((cw  (selected-window))
+;;   ;;         (path (buffer-file-name))) ;;; save current window/buffer
+;;   ;;     (progn
+;;   ;;       (when (and (fboundp 'projectile-project-p)
+;;   ;;                  (projectile-project-p)
+;;   ;;                  (fboundp 'projectile-project-root))
+;;   ;;         (neotree-dir (projectile-project-root)))
+;;   ;;       (neotree-find-path) ;; Should this be neotree-find? )
+;;   ;;     (select-window cw)))
+;;   ;; :hook
+;;   ;; (persp-switch . my/persp-neo))
+;;   )
 
-;; Recommendation from the perspective page to reduce the
-;; amount of window-splitting
-(customize-set-variable 'display-buffer-base-action
-  '((display-buffer-reuse-window display-buffer-same-window)
-    (reusable-frames . t)))
-(customize-set-variable 'even-window-sizes nil)     ; avoid resizing
+;; ;; Recommendation from the perspective page to reduce the
+;; ;; amount of window-splitting
+;; (customize-set-variable 'display-buffer-base-action
+;;   '((display-buffer-reuse-window display-buffer-same-window)
+;;     (reusable-frames . t)))
+;; (customize-set-variable 'even-window-sizes nil)     ; avoid resizing
 
 ;; Just a note that using perspective/persp-mode handles keeping different window layouts
 ;; available
@@ -277,36 +287,18 @@
 ;; (load "fira-code") ;; best not to include the ending “.el” or “.elc”
 ;; (load "git-timemachine")
 
-(use-package smart-tab
-  ;; :ensure t
-  )
+(use-package smart-tab)
 
-;; I want general to do lazy binding of keys with use-package
-(use-package general
-  ;; :ensure t
-  )
 
 ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/general.el"))
 ;; (require 'general)
 
-(use-package git-link
-  ;; :ensure t
-  )
-(use-package git-timemachine
-  ;; :ensure t
-  )
-
-;; (use-package flatui-theme :ensure :defer)
-;; (use-package nyx-theme :ensure :defer)
-;; (use-package zenburn-theme :ensure t :defer)
-;; (use-package afternoon-theme :ensure t :defer)
-;; (load-theme 'afternoon t)
-;; (add-hook 'after-init-hook (lambda () (load-theme 'afternoon)))
+(use-package git-link)
+(use-package git-timemachine)
 
 
-(use-package inkpot-theme
-  ;; :ensure t
-  )
+(use-package inkpot-theme)
+
 (add-hook 'elpaca-after-init-hook (lambda () (load-theme 'inkpot t)))
 
 ;; TODO: Change this to using the python-mode hooks in the python configuration
@@ -324,107 +316,18 @@
 
 
 ;; https://emacs.stackexchange.com/questions/3458/how-to-switch-between-windows-quickly
-(windmove-default-keybindings 'meta)
+(windmove-default-keybindings 'meta) ;; Note - I almost never make use of this.
 
     
 (add-hook 'after-save-hook #'whitespace-sucks)
-;; ;;; Treemacs config as of 2019-12-06
-;; ;;; this is everything at the defaults from https://github.com/Alexander-Miller/treemacs
-;; (use-package treemacs
-;;   :ensure t
-;;   :defer t
-;;   :init
-;;   (with-eval-after-load 'winum
-;;     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-;;   :config
-;;   (progn
-;;     (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
-;;           treemacs-deferred-git-apply-delay      0.5
-;;           treemacs-display-in-side-window        t
-;;           treemacs-eldoc-display                 t
-;;           treemacs-file-event-delay              5000
-;;           treemacs-file-extension-regex          treemacs-last-period-regex-value
-;;           treemacs-file-follow-delay             0.2
-;;           treemacs-follow-after-init             t
-;;           treemacs-git-command-pipe              ""
-;;           treemacs-goto-tag-strategy             'refetch-index
-;;           treemacs-indentation                   2
-;;           treemacs-indentation-string            " "
-;;           treemacs-is-never-other-window         nil
-;;           treemacs-max-git-entries               5000
-;;           treemacs-missing-project-action        'ask
-;;           treemacs-no-png-images                 nil
-;;           treemacs-no-delete-other-windows       t
-;;           treemacs-project-follow-cleanup        nil
-;;           treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-;;           treemacs-position                      'left
-;;           treemacs-recenter-distance             0.1
-;;           treemacs-recenter-after-file-follow    nil
-;;           treemacs-recenter-after-tag-follow     nil
-;;           treemacs-recenter-after-project-jump   'always
-;;           treemacs-recenter-after-project-expand 'on-distance
-;;           treemacs-show-cursor                   nil
-;;           treemacs-show-hidden-files             t
-;;           treemacs-silent-filewatch              nil
-;;           treemacs-silent-refresh                nil
-;;           treemacs-sorting                       'alphabetic-desc
-;;           treemacs-space-between-root-nodes      t
-;;           treemacs-tag-follow-cleanup            t
-;;           treemacs-tag-follow-delay              1.5
-;;           treemacs-width                         35)
-
-;;     ;; The default width and height of the icons is 22 pixels. If you are
-;;     ;; using a Hi-DPI display, uncomment this to double the icon size.
-;;     ;;(treemacs-resize-icons 44)
-
-;;     (treemacs-follow-mode t)
-;;     (treemacs-filewatch-mode t)
-;;     (treemacs-fringe-indicator-mode t)
-;;     (pcase (cons (not (null (executable-find "git")))
-;;                  (not (null treemacs-python-executable)))
-;;       (`(t . t)
-;;        (treemacs-git-mode 'deferred))
-;;       (`(t . _)
-;;        (treemacs-git-mode 'simple))))
-;;   :bind
-;;   (:map global-map
-;;         ("M-0"       . treemacs-select-window)
-;;         ("C-x t 1"   . treemacs-delete-other-windows)
-;;         ("C-x t t"   . treemacs)
-;;         ("C-x t B"   . treemacs-bookmark)
-;;         ("C-x t C-t" . treemacs-find-file)
-;;         ("C-x t h" . treemacs-helpful-hydra)        
-;;         ("C-x t M-t" . treemacs-find-tag)))
-
-;; (use-package treemacs-projectile
-;;   :after treemacs projectile
-;;   :ensure t)
-
-;; (use-package treemacs-icons-dired
-;;   :after treemacs dired
-;;   :ensure t
-;;   :config (treemacs-icons-dired-mode))
-
-;; (use-package treemacs-magit
-;;   :after treemacs magit
-;;   :ensure t)
-;; M-x t h h 
-
 ;; Do not let C-z do the usual thing it does
 (put 'suspend-frame 'disabled t)
 
 
 
-;; Try org-brain to see if its ability to organized and concept map works
-;; Allows you to edit entries directly from org-brain-visualize
-;; (use-package polymode
-;;   :ensure t
-;;   :config
-;;   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
-
 (use-package dumb-jump
-  ;; :ensure t
-  )
+  :hook (xref-backend-functions . dumb-jump-xref-activate))
+
 
 (use-package eterm-256color
   :hook (term-mode . eterm-256color-mode))

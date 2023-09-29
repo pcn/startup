@@ -30,6 +30,8 @@
   ;; :ensure t
   ) ;; show a smaller view of the file being visited
 
+(use-package rainbow-delimiters )
+
 ;; better smart parens than paredit, maybe?
 ;; Based on https://www.wisdomandwonder.com/article/9897/use-package-smartparens-config-ensure-smartparens
 (use-package smartparens
@@ -52,9 +54,12 @@
   ;; :ensure t
   :init
   (global-tree-sitter-mode))
+
 (use-package tree-sitter-langs
   ;; :ensure t
   )
+
+
 
 ;; ;; use-package-hydra to allow hydras to be bound to
 ;; ;; use-package
@@ -63,33 +68,35 @@
 ;; (elpaca-wait) ;; Or the hydra part of use-package will not work
 ;; (use-package hydra)
 
-;; (use-package lsp-origami
-;;   :after origami)
+(use-package yaml-mode)
 
-;; (use-package origami
-;;   :hook
-;;   (yaml-mode . origami-mode)
-;;   (go-mode . origami-mode)
-;;   :after use-package-hydra use-package
-;;   :bind ("C-c C-v" . hydra-origami/open-node)
-;;   :hydra
-;;   (hydra-origami (:color red)
-;;   "
-;;   _o_pen node    _n_ext fold       toggle _f_orward
-;;   _c_lose node   _p_revious fold   toggle _a_ll
-;;   "
-;;   ("o" origami-open-node)
-;;   ("c" origami-close-node)
-;;   ("n" origami-next-fold)
-;;   ("p" origami-previous-fold)
-;;   ("f" origami-forward-toggle-node)
-;;   ("a" origami-toggle-all-nodes))
+(use-package lsp-origami
+  :after origami)
 
-;;   )
+(use-package origami
+  :hook
+  (yaml-mode . origami-mode)
+  (go-mode . origami-mode)
+  :after use-package-hydra use-package
+  :bind ("C-c C-v" . hydra-origami/open-node)
+  :hydra
+  (hydra-origami (:color red)
+  "
+  _o_pen node    _n_ext fold       toggle _f_orward
+  _c_lose node   _p_revious fold   toggle _a_ll
+  "
+  ("o" origami-open-node)
+  ("c" origami-close-node)
+  ("n" origami-next-fold)
+  ("p" origami-previous-fold)
+  ("f" origami-forward-toggle-node)
+  ("a" origami-toggle-all-nodes))
+
+  )
 
 
 
-
+;; This doesn't work, still, without some more investigation/tinkering 2023-06-18
 ;; optionally if you want to use debugger
 (use-package dap-mode
   ;; :ensure t
@@ -128,7 +135,7 @@
   (setq lsp-idle-delay 0.500)
   :hook
   (lsp-mode . (lambda () (auto-complete-mode -1))) ;; https://stackoverflow.com/questions/29169210/how-to-disable-global-minor-mode-in-a-specified-major-mode
-  (lsp-after-open . lsp-origami-enable)
+  ;; (lsp-after-open . lsp-origami-enable) ;; XXX look at fixing this so I can 
   )
 
 
@@ -139,14 +146,19 @@
 
 ;; Working off of
 ;; https://github.com/daviwil/emacs-from-scratch/blob/210e517353abf4ed669bc40d4c7daf0fabc10a5c/Emacs.org
+;; And here is more documentation on what the various features are:
+;; https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
 (use-package lsp-ui
   ;; :ensure t
   :hook (lsp-mode . lsp-ui-mode)
   :custom
+  (lsp-ui-doc-enable t)
   (lsp-ui-doc-position 'bottom)
   (lsp-ui-sideline-delay 2)
-  (lsp-ui-sikdeline-show-hover t)
-  (lsp-ui-doc-max-height 8))
+  (lsp-ui-doc-show-with-cursor t)
+  ;; (lsp-ui-sideline-show-hover t)
+  ;; (lsp-ui-doc-max-height 8)
+  )
 
 (use-package flycheck
   ;; :ensure t
@@ -298,10 +310,11 @@
   ;; :ensure t
   )
 
-(use-package fira-code-mode
-  ;; :ensure t
-  :custom (fira-code-mode-disabled-ligatures '("//" ":=" "==" ";;" "x" "[]" "++" "**")) ;; List of ligatures to turn off
-  :hook prog-mode) ;; Enables fira-code-mode automatically for programming major modes
+;; Fira is more annoying than useful as of 2023-06-18
+;; (use-package fira-code-mode
+;;   ;; :ensure t
+;;   :custom (fira-code-mode-disabled-ligatures '("//" ":=" "==" ";;" "x" "[]" "++" "**")) ;; List of ligatures to turn off
+;;   :hook prog-mode) ;; Enables fira-code-mode automatically for programming major modes
 
 (provide 'development-settings)
 ;;; lsp-settings.el ends here

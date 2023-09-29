@@ -7,6 +7,11 @@
 
 ;;; Code:
 
+;; Todo: Now that I've added bindings for the grouping functions,
+;; I think it'd be helpful to have groups that are dynamically created
+;; for each projectile project
+;; Can I do that based on https://github.com/ema2159/centaur-tabs#buffer-groups
+
 
 (use-package centaur-tabs
   ;; :ensure
@@ -21,10 +26,16 @@
   ;; Prior is pgup, next is pgdown
   ("C-<prior>" . centaur-tabs-backward)
   ("C-<next>" . centaur-tabs-forward)
-  ("C-<tab>" . centaur-tabs-counsel-switch-group))
-  ;; :init
-  ;; (setq centaur-tabs-enable-key-bindings t) )
+  ("C-<tab>" . centaur-tabs-counsel-switch-group)
+  ("C-c g f" . centaur-tabs-forward-group)
+  ("C-c g b" . centaur-tabs-backward-group)
+  ("C-c g g" . centaur-tabs-counsel-switch-group)
 
+
+  :init
+  (centaur-tabs-group-by-projectile-project))
+
+  ;; (setq centaur-tabs-enable-key-bindings t) )
 
 (provide 'tab-settings)
 ;;; tab-settings.el ends here

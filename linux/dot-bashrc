@@ -122,15 +122,3 @@ for f in $(ls ~/.bash.d/??-*.sh | sort -n) ; do
 done
 complete -C '' aws 
 complete -C 
-complete -C '' aws 
-complete -C 
-complete -C '' aws 
-complete -C 
-complete -C '' aws 
-complete -C 
-complete -C '' aws 
-complete -C 
-complete -C '' aws 
-complete -C 
-complete -C '' aws 
-complete -C 
