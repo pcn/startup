@@ -8,8 +8,14 @@ if [ -f $HOME/.config/guix/current/etc/profile ]  ; then
     # based on what I'm reading at
     # https://guix.gnu.org/cookbook/en/html_node/Basic-setup-with-manifests.html
     # and put it outside of my home dir to avoid pop-os breaking, hopefully
-    export GUIX_LOCPATH=$HOME/.guix-profile/lib/locale    
+    export GUIX_LOCPATH=$HOME/.guix-profile/lib/locale
     
+    # Automatically added by the Guix install script.
+    if [ -n "$GUIX_ENVIRONMENT" ]; then
+        if [[ $PS1 =~ (.*)"\\$" ]]; then
+            PS1="${BASH_REMATCH[1]} [env]\\\$ "
+        fi
+    fi
 else
     cat <<EOF
 guix doesn't seem to be installed. Please follow the instructions at

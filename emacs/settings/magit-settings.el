@@ -42,6 +42,7 @@
   :custom
   (blamer-idle-time 0.3)
   (blamer-min-offset 70)
+  (blamer-show-avatar-p nil "Having failues loading avatars, silence it")
   :custom-face
   (blamer-face ((t :foreground "#7a88cf"
                     :background nil

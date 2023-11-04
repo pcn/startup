@@ -310,6 +310,9 @@
   ;; :ensure t
   )
 
+(use-package rg)
+(use-package wgrep)
+
 ;; Fira is more annoying than useful as of 2023-06-18
 ;; (use-package fira-code-mode
 ;;   ;; :ensure t
