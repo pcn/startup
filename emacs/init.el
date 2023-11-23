@@ -85,6 +85,7 @@
 (load "org-mode-settings.el")
 (load "various-other-settings.el")  ;; Things I want moved out of init.el here
 (load "tramp-settings.el")
+(load "codeium.el")
 
 (put 'narrow-to-region 'disabled nil)
 (elpaca-process-queues)
