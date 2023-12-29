@@ -82,10 +82,12 @@
 
 ;; High-dpi screen means long nyan bar
 
-(use-package nlinum
-  ;; :ensure t
-  :config
-  (nlinum-mode t))
+;; (use-package nlinum
+;;   :config
+;;   (nlinum-mode t))
+
+(global-display-line-numbers-mode 1)
+
 (use-package nyan-mode
   ;; :ensure t
   :init

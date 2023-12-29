@@ -18,6 +18,35 @@
 ;; here, it's a runtime requirement it doesn't prevent loading.
 (use-package sqlite3)
 
+;; 2023-12-19 error during startup reads:
+;; ⛔ Emergency (magit): Magit requires ‘transient’ >= 0.5.0,
+;; but due to bad defaults, Emacs’ package manager, refuses to
+;; upgrade this and other built-in packages to higher releases
+;; from GNU Elpa.
+;; 
+;; To fix this, you have to add this to your init file:
+;; 
+;;   (setq package-install-upgrade-built-in t)
+;; 
+;; Then evaluate that expression by placing the cursor after it
+;; and typing C-x C-e.
+;; 
+;; Once you have done that, you have to explicitly upgrade ‘transient’:
+;; 
+;;   M-x package-upgrade transient RET
+;; 
+;; Then you also must make sure the updated version is loaded,
+;; by evaluating this form:
+;; 
+;;   (progn (unload-feature ’transient t) (require ’transient))
+;; 
+;; If you don’t use the ‘package’ package manager but still get
+;; this warning, then your chosen package manager likely has a
+;; similar defect.
+
+;; which leads to https://github.com/magit/magit/issues/5059
+(use-package transient)
+
 (use-package magit
   ;; :ensure t
   )
