@@ -313,6 +313,16 @@
 (use-package rg)
 (use-package wgrep)
 
+;; Helpfully convert strings between different programming cases
+;; https://github.com/akicho8/string-inflection
+(use-package string-inflection
+  :general
+  ("C-c C-i i" 'string-inflection-cycle)
+  ("C-c C-i s" 'string-inflection-underscore)
+  ("C-c C-i c" 'string-inflection-camelcase)
+  )
+
+
 ;; Fira is more annoying than useful as of 2023-06-18
 ;; (use-package fira-code-mode
 ;;   ;; :ensure t
