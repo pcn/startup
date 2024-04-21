@@ -120,5 +120,3 @@ fi
 for f in $(ls ~/.bash.d/??-*.sh | sort -n) ; do
     source $f
 done
-complete -C '' aws 
-complete -C 

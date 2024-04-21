@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # alias kubectl='docker exec k0s-controller kubectl'
-if [ -x $(type -p kubectl) ] ; then
+if [ "x$(type -t kubectl)" != "x" ] ; then
 
     source <(kubectl completion bash)
     source ~/dvcs/github/kubectx/completion/*.bash
@@ -9,6 +9,6 @@ if [ -x $(type -p kubectl) ] ; then
     # alias mk="microk8s kubectl"
     alias k="kubectl"
 else
-    echo "You don't have kubectl installed yet"
+    echo "You don't have kubectl installed, skipping"
 fi
 
