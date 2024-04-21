@@ -13,9 +13,7 @@ if [ -d $HOME/.asdf ]  ; then
     # Note:
     #  asdf reshim golang
     # after `go get` or `go install`
-export ASDF_GOLANG_DEFAULT_PACKAGES_FILE=~/.bash.d/asdf-default-golang-pkgs
-
-
+   export ASDF_GOLANG_DEFAULT_PACKAGES_FILE=~/.bash.d/asdf-default-golang-pkgs
 else
     echo "You don't have asdf installed, skipping"
     # If we want to install asdf, use the generic install instructions at
