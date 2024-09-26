@@ -151,7 +151,7 @@ or the equivalent at the end of the file"
 ;; (with-eval-after-load 'rust-mode
 ;;   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
-(use-package toml-mode)
+;; (use-package toml-mode)
 
 ;; (require 'lsp-rust)
 ;; (add-hook 'rust-mode-hook 'cargo-minor-mode)

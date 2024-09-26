@@ -16,12 +16,14 @@
 
 (global-set-key (kbd "C-s") 'swiper)
 ;; (global-set-key "\C-r" 'swiper)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-c P") 'counsel-package)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "C-c r g") 'counsel-rg)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-c P") 'counsel-package)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(global-set-key (kbd "C-c r g") 'counsel-rg)
+(global-set-key (kbd "C-M-j") 'ivy-immediate-done)
+(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+
 
   ;; Don't use the default switch-to-buffer, use counsel's switch-to-buffer which provides a
   ;; preview of buffers.
@@ -68,12 +70,16 @@
 ;; Referencing https://github.com/syl20bnr/spacemacs/issues/4207,
 ;; Maybe shell startup is killing me
 ;; (setq shell-file-name "/bin/sh")
-(use-package projectile-mode
+(use-package projectile
+  :config
   (projectile-mode +1)
-  (setq projectile-enable-caching t)
-  (projectile-global-mode)
-  )
-(global-set-key (kbd "C-c p") 'projectile-command-map)
+  (projectile-enable-caching t)
+  (projectile-global t)p
+  :general
+  
+  ("C-c p" 'projectile-command-map))
+
+
 
 (defun my-ivy-completing-read (&rest args)
   (let ((ivy-sort-functions-alist '((t . nil))))

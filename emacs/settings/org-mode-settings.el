@@ -96,8 +96,8 @@ contains an ID, that ID will be replaced with a new one."
   (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO" "TOOLATE"))))
 
 
-(use-package emacsql)
-
+;; Emacsql is a dependency of something in forge, I think, so it doesn't need to be loaded here.
+;; (use-package emacsql)
 (use-package emacsql-sqlite )
 
 ;; Also try to do org-roam for bidirectional links?

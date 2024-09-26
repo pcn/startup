@@ -11,9 +11,9 @@
 ;; should be default for 27.1 and newer Note
 ;; Need to install: clang, clang-dev
 ;; Why isn't this in the rust settings??
-(use-package parinfer-rust-mode
-  ;; :ensure t
-  )
+;; (use-package parinfer-rust-mode
+;;   ;; :ensure t
+;;   )
 
 ;;; typescript ide apparently? Similar to CIDER for clojure, I guess?
 (use-package tide

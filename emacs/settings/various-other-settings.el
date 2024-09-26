@@ -13,16 +13,16 @@
 ;; The table handling needs org-mode to be loaded,
 ;; which in 27.1 it ma not be, so
 ;; on init, load the org library
-(use-package perspective
-  ;; :ensure t
-  :bind
-  ("C-x C-b" . persp-list-buffers)
+;; (use-package perspective
+;;   ;; :ensure t
+;;   :bind
+;;   ("C-x C-b" . persp-list-buffers)
 
-  :custom
-  (persp-mode-prefix-key (kbd "C-c M-p"))
-  (persp-suppress-no-prefix-key-warning to t)
-  :init
-  (persp-mode))
+;;   :custom
+;;   (persp-mode-prefix-key (kbd "C-c M-p"))
+;;   (persp-suppress-no-prefix-key-warning to t)
+;;   :init
+;;   (persp-mode))
 
 (use-package auto-complete
   ;; :ensure t

@@ -59,10 +59,11 @@
 
 
 ;; TODO: move these to the development settings file, and use-package
-(use-package rainbow-delimiters
-;;  :ensure t
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-  )
+;; (use-package rainbow-delimiters
+;;   ;;  :ensure t
+;;   :config 
+;;   (add-hook 'prog-mode-hook rainbow-delimiters-mode)
+;;   )
 
 
 ;; (add-hook 'after-init-hook 'global-company-mode)
@@ -115,14 +116,14 @@
 ;; (mmm-add-mode-ext-class 'html-mode "\\.sls\\'" 'mako)
 
 
-(use-package counsel-projectile
-  ;; :ensure t
-  :config
-  (counsel-projectile-mode))
+;; (use-package counsel-projectile
+;;   ;; :ensure t
+;;   :config
+;;   (counsel-projectile-mode))
 
-(use-package persp-projectile
-  ;; :ensure t
-  )
+;; (use-package persp-projectile
+;;   ;; :ensure t
+;;   )
   
 
 ;; (use-package perspective
@@ -192,17 +193,9 @@
 
 ;; More projectile configuration for neotree this time
 ;; from  https://www.emacswiki.org/emacs/NeoTree#h5o-8
-(setq projectile-switch-project-action 'neotree-projectile-action)
+(setq projectile-switch-project-action 'projectile-find-file)
 
 
-
-;; flycheck with pycheckers to enable checking.
-(use-package flycheck
-  ;; :ensure t
-  (setq global-flycheck-mode 1)
-  )
-(with-eval-after-load 'flycheck
-      (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 ;; 
 ;; Optionally
@@ -247,11 +240,6 @@
 (global-set-key (kbd "C-c a c y") #'yas-insert-snippet)
 (global-set-key (kbd "C-c a c e") #'yas-expand)
 
-
-;; Paren
-(setq show-paren-mode 1)
-(setq show-paren-delay 0)
-(show-paren-mode)
 
 ;; Golang setup per https://github.com/cockroachdb/cockroach/wiki/Ben%27s-Go-Emacs-setup
 
@@ -350,6 +338,10 @@
 ;;   (popper-mode +1)
 ;;   (popper-echo-mode +1))  
 ;; ;; https://www.emacswiki.org/emacs/TrampMode
+
+(use-package dirvish
+  :config
+  (dirvish-override-dired-mode))
 
 
 (provide 'early-misc)

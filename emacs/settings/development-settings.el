@@ -12,9 +12,9 @@
 
 ;;; Code:
 ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-(use-package projectile
-  ;; :ensure t
-  )
+;; (use-package projectile  ;;; This is in ivy-settings
+;;   ;; :ensure t
+;;   )
 (use-package counsel
   ;; :ensure t
   )
@@ -30,7 +30,15 @@
   ;; :ensure t
   ) ;; show a smaller view of the file being visited
 
-(use-package rainbow-delimiters )
+;; Paren
+
+;; (setq show-paren-mode 1)
+;; (setq show-paren-delay 0)
+;; (show-paren-mode)
+(use-package rainbow-delimiters
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
+
 
 ;; better smart parens than paredit, maybe?
 ;; Based on https://www.wisdomandwonder.com/article/9897/use-package-smartparens-config-ensure-smartparens
@@ -70,37 +78,36 @@
 
 (use-package yaml-mode)
 
-(use-package lsp-origami
-  :after origami)
+;; (use-package lsp-origami
+;;   :after origami)
 
-(use-package origami
-  :hook
-  (yaml-mode . origami-mode)
-  (go-mode . origami-mode)
-  :after use-package-hydra use-package
-  :bind ("C-c C-v" . hydra-origami/open-node)
-  :hydra
-  (hydra-origami (:color red)
-  "
-  _o_pen node    _n_ext fold       toggle _f_orward
-  _c_lose node   _p_revious fold   toggle _a_ll
-  "
-  ("o" origami-open-node)
-  ("c" origami-close-node)
-  ("n" origami-next-fold)
-  ("p" origami-previous-fold)
-  ("f" origami-forward-toggle-node)
-  ("a" origami-toggle-all-nodes))
-
-  )
+;; (use-package origami
+;;   :hook
+;;   (yaml-mode . origami-mode)
+;;   (go-mode . origami-mode)
+;;   ;; :after use-package-hydra use-package
+;;   :bind ("C-c C-v" . hydra-origami/open-node)
+;;   ;; :hydra
+;;   ;; (hydra-origami (:color red)
+;;   "
+;;   _o_pen node    _n_ext fold       toggle _f_orward
+;;   _c_lose node   _p_revious fold   toggle _a_ll
+;;   "
+;;   ("o" origami-open-node)
+;;   ("c" origami-close-node)
+;;   ("n" origami-next-fold)
+;;   ("p" origami-previous-fold)
+;;   ("f" origami-forward-toggle-node)
+;;   ("a" origami-toggle-all-nodes))
+  
 
 
 
 ;; This doesn't work, still, without some more investigation/tinkering 2023-06-18
 ;; optionally if you want to use debugger
-(use-package dap-mode
-  ;; :ensure t
-  )
+;; (use-package dap-mode
+;;   ;; :ensure t
+;;   )
 
 
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
@@ -108,6 +115,9 @@
 ;; ;; TODO: include lsp-ui?
 ;; (require 'lsp-mode)
 
+;; XXX UNDO
+;; (use-package company
+;;   :hook (company-mode . global-company-mode))
 
 ;; lsp-mode
 ;; https://github.com/emacs-lsp/lsp-mode/blob/master/README.org#performance
@@ -124,6 +134,7 @@
   ;; :ensure t
   :commands lsp
   :config
+  ;; :after company-lsp
 ;;   (require 'lsp-clients)
   ;; change nil to 't to enable logging of packets between emacs and the LS
   ;; this was invaluable for debugging communication with the MS Python Language Server
@@ -160,10 +171,15 @@
   ;; (lsp-ui-doc-max-height 8)
   )
 
+;; flycheck with pycheckers to enable checking.
 (use-package flycheck
   ;; :ensure t
+  :config
+  (setq global-flycheck-mode 1)
   )
 
+(with-eval-after-load 'flycheck
+      (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 ;; (use-package lsp-ui
 ;;   :ensure t
@@ -186,13 +202,14 @@
 
 ;; Number the candidates (use M-1, M-2 etc to select completions).
 
+
 (use-package lsp-ivy
   ;; :ensure t
   :after lsp)
 
-(use-package lsp-treemacs
-  ;; :ensure t
-  :after lsp)
+;; (use-package lsp-treemacs
+;;   ;; :ensure t
+;;   :after lsp)
 
 (use-package yasnippet-snippets
   ;; :ensure t
@@ -259,14 +276,14 @@
 ;;             (company-complete-common)
 ;;           (indent-for-tab-command)))))
 
-(use-package toml-mode :ensure)
+(use-package toml-mode)
 
 ;; -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ;; setting up debugging support with dap-mode
 
-(use-package exec-path-from-shell
-  ;; :ensure t
-  :init (exec-path-from-shell-initialize))
+;; (use-package exec-path-from-shell
+;;   ;; :ensure t
+;;   :init (exec-path-from-shell-initialize))
 
 ;; Originally relied on lldb-mi, but that appears to no
 ;; longer be shipped as part of llvm, so, well, what to do?
@@ -310,7 +327,8 @@
   ;; :ensure t
   )
 
-(use-package rg)
+;; rg is enabled in early-misc
+;; (use-package rg)
 (use-package wgrep)
 
 ;; Helpfully convert strings between different programming cases
@@ -328,6 +346,90 @@
 ;;   ;; :ensure t
 ;;   :custom (fira-code-mode-disabled-ligatures '("//" ":=" "==" ";;" "x" "[]" "++" "**")) ;; List of ligatures to turn off
 ;;   :hook prog-mode) ;; Enables fira-code-mode automatically for programming major modes
+
+;; Combobulate, from the masteringemacs site's maintainer
+;; https://github.com/mickeynp/combobulate
+;; This may be enough configuration on its own to merit its own file?
+
+(use-package json-mode) ;; Without this, js-json mode is used, and tree-sitter doesn't know what to infer from that
+
+(use-package treesit
+  ;; For using elpaca's 'use-package' with tree-sitter, do not run the build steps since it's built-into emacs
+  :build (:not elpaca--clone-dependencies elpaca--queue-dependencies
+                      elpaca--generate-autoloads-async elpaca--byte-compile
+                      elpaca--compile-info elpaca--install-info
+                      elpaca--add-info-path elpaca--activate-package)  
+  :mode (("\\.tsx\\'" . tsx-ts-mode))
+  :preface
+  (defun mp-setup-install-grammars () 
+    "Install Tree-sitter grammars if they are absent."
+    (interactive)
+    (dolist (grammar
+             ;; Note the version numbers. These are the versions that
+             ;; are known to work with Combobulate *and* Emacs.
+             '((css . ("https://github.com/tree-sitter/tree-sitter-css" "v0.20.0"))
+               (go . ("https://github.com/tree-sitter/tree-sitter-go" "v0.20.0"))
+               (html . ("https://github.com/tree-sitter/tree-sitter-html" "v0.20.1"))
+               (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.20.1" "src"))
+               (json ("https://github.com/tree-sitter/tree-sitter-json" "v0.20.2"))
+               (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+               (python ("https://github.com/tree-sitter/tree-sitter-python" "v0.20.4"))
+               (rust "https://github.com/tree-sitter/tree-sitter-rust")
+               (toml . ("https://github.com/tree-sitter/tree-sitter-toml" "v0.5.1"))
+               (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))
+               (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
+               (yaml ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))))
+      (add-to-list 'treesit-language-source-alist grammar)
+      ;; Only install `grammar' if we don't already have it
+      ;; installed. However, if you want to *update* a grammar then
+      ;; this obviously prevents that from happening.
+      (unless (treesit-language-available-p (car grammar))
+        (treesit-install-language-grammar (car grammar)))))
+
+  ;; Optional. Combobulate works in both xxxx-ts-modes and
+  ;; non-ts-modes.
+
+  ;; You can remap major modes with `major-mode-remap-alist'. Note
+  ;; that this does *not* extend to hooks! Make sure you migrate them
+  ;; also
+  (dolist (mapping
+           '((python-mode . python-ts-mode)
+             (css-mode . css-ts-mode)
+             (typescript-mode . typescript-ts-mode)
+             (js2-mode . js-ts-mode)
+             (bash-mode . bash-ts-mode)
+             (conf-toml-mode . toml-ts-mode)
+             (go-mode . go-ts-mode)
+             (css-mode . css-ts-mode)
+             (json-mode . json-ts-mode)
+             ;; Well, this seems to be the mode 
+             (js-json-mode . json-ts-mode)))
+    (add-to-list 'major-mode-remap-alist mapping))
+  :config
+  (mp-setup-install-grammars)
+  ;; Do not forget to customize Combobulate to your liking:
+  ;;
+  ;;  M-x customize-group RET combobulate RET
+  ;;
+  (use-package combobulate
+    :custom
+    ;; You can customize Combobulate's key prefix here.
+    ;; Note that you may have to restart Emacs for this to take effect!
+    (combobulate-key-prefix "C-c o")
+    :hook ((prog-mode . combobulate-mode))
+    ;; Amend this to the directory where you keep Combobulate's source
+    ;; code.
+    :load-path ("/home/pcn/dvcs/github/combobulate")))
+
+(use-package combobulate
+   :custom
+   ;; You can customize Combobulate's key prefix here.
+   ;; Note that you may have to restart Emacs for this to take effect!
+   (combobulate-key-prefix "C-c o")
+   :hook ((prog-mode . combobulate-mode))
+   ;; Amend this to the directory where you keep Combobulate's source
+   ;; code.
+   :load-path ("/home/pcn/dvcs/github/combobulate"))
 
 (provide 'development-settings)
 ;;; lsp-settings.el ends here

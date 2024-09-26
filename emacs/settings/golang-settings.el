@@ -79,10 +79,9 @@
 ;; (projectile-global-mode 1)
 (use-package go-projectile
   ;; :ensure t
+  :config
+  (setq projectile-mode 1)
   )
-
-(use-package projectile
-  (projectile-mode 1))
 
 ; gotest defines a better set of error regexps for go tests, but it only
 ; enables them when using its own functions. Add them globally for use in
@@ -91,13 +90,13 @@
 ;;   )
 (use-package gotest
   ;; :ensure t
-(dolist (elt go-test-compilation-error-regexp-alist-alist)
-  (add-to-list 'compilation-error-regexp-alist-alist elt))
-(defun prepend-go-compilation-regexps ()
-  (dolist (elt (reverse go-test-compilation-error-regexp-alist))
-    (add-to-list 'compilation-error-regexp-alist elt t)))
-(add-hook 'go-mode-hook 'prepend-go-compilation-regexps)
-)
+  :config
+  (dolist (elt go-test-compilation-error-regexp-alist-alist)
+    (add-to-list 'compilation-error-regexp-alist-alist elt))
+  (defun prepend-go-compilation-regexps ()
+    (dolist (elt (reverse go-test-compilation-error-regexp-alist))
+      (add-to-list 'compilation-error-regexp-alist elt t)))
+  (add-hook 'go-mode-hook 'prepend-go-compilation-regexps))
 
 
 (provide 'golang-settings)

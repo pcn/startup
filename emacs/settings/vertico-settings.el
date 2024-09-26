@@ -42,7 +42,9 @@
   ;;       #'command-completion-default-include-p)
 
   ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t)  
+  (setq enable-recursive-minibuffers t)
+  :config
+  (run-hooks 'local-vertico-mode-hook)
   )
 
 
@@ -56,14 +58,14 @@
         completion-category-defaults nil
         completion-category-overrides '((file (styles partial-completion)))))
 
-(use-package projectile
-  :init
-  (projectile-mode +1)
-  (setq projectile-enable-caching t)
-  :config
-  (projectile-global-mode)
-  (global-set-key (kbd "C-c p") 'projectile-command-map)
-  )
+
+(add-hook 'local-vertico-mode-hook
+  (lambda ()
+    ;; Additional configuration for Go mode
+    (setq projectile-enable-caching t)
+    (projectile-mode)
+    (global-set-key (kbd "C-c p") 'projectile-command-map)
+    ))
 
 ;; https://github.com/minad/corfu
 ;; Alternative to company-mode
