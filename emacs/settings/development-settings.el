@@ -431,5 +431,11 @@
    ;; code.
    :load-path ("/home/pcn/dvcs/github/combobulate"))
 
+
+(use-package ob-grpc
+  :host github
+  :repo "shsms/ob-grpc"
+  :branch "main" )
+
 (provide 'development-settings)
 ;;; lsp-settings.el ends here

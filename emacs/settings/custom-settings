@@ -14,9 +14,9 @@
  '(line-number-mode nil)
  '(lsp-rust-full-docs t)
  '(lsp-rust-server 'rust-analyzer)
- '(org-agenda-files nil)
+ '(org-agenda-files nil t)
  '(package-selected-packages
-   '(whitespace-celeanup org-roam forge magit yasnippet-snippets yaml-mode use-package typescript-mode tree-sitter-langs toml-mode tide terraform-mode smartparens smart-tab rustic ron-mode rg restclient rainbow-delimiters popper persp-projectile parinfer-rust-mode org-super-agenda nyan-mode nlinum neotree mo-git-blame minimap melancholy-theme marginalia lsp-ui lsp-pyright lsp-ivy json-par json-navigator inkpot-theme helm-ag gotest go-projectile git-timemachine git-link git-commit ghub general fira-code-mode feature-mode emacsql-sqlite dumb-jump docker-tramp counsel-projectile company closql cider centaur-tabs auto-complete afternoon-theme))
+   '(p4-16-mode whitespace-celeanup org-roam forge magit yasnippet-snippets yaml-mode use-package typescript-mode tree-sitter-langs toml-mode tide terraform-mode smartparens smart-tab rustic ron-mode rg restclient rainbow-delimiters popper persp-projectile parinfer-rust-mode org-super-agenda nyan-mode nlinum neotree mo-git-blame minimap melancholy-theme marginalia lsp-ui lsp-pyright lsp-ivy json-par json-navigator inkpot-theme helm-ag gotest go-projectile git-timemachine git-link git-commit ghub general fira-code-mode feature-mode emacsql-sqlite dumb-jump docker-tramp counsel-projectile company closql cider centaur-tabs auto-complete afternoon-theme))
  '(safe-local-variable-values
    '((cargo-test-arguments . "")
      (cargo-test-arguments . "--test matrix")
