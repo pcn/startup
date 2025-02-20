@@ -82,7 +82,7 @@
             "C-c C-c C-t l" 'pcn-cargo-test-file-local)
 ;;  :mode ("\\.rs?\\" . rustic)
   :config
-  ;; (setq rustic-format-on-save t)  ;; lsp should do this now
+  (setq rustic-format-on-save f)  ;; lsp should do this now
   (setq rustic-lsp-format t)
   (setq lsp-rust-analyzer-proc-macro-enable t)
   (setq rustic-format-trigger 'on-save)
