@@ -10,22 +10,18 @@
 ;; Parinfer-rust works with emacs with dynamic module support, which
 ;; should be default for 27.1 and newer Note
 ;; Need to install: clang, clang-dev
-(use-package parinfer-rust-mode
-  ;; :ensure t
-  )
-
-(use-package cider
+(elpaca cider (use-package cider
   ;; :ensure t
   :hook 
   (clojure-mode . smartparens-strict-mode)
   ;; (clojure-mode . fira-code-mode)
-  (clojure-mode . parinfer-rust-mode)
+  ;;   (clojure-mode . parinfer-rust-mode)
   :general
   (:keymaps 'clojure-mode-map
             "M-p s r" 'paredit-forward-slurp-sexp
             "M-p s l" 'paredit-backward-slurp-sexp
             "M-p b r" 'paredit-forward-barf-sexp
-            "M-p b l" 'paredit-backward-barf-sexp))
+            "M-p b l" 'paredit-backward-barf-sexp)))
             
 
 

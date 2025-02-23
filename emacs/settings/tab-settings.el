@@ -13,7 +13,7 @@
 ;; Can I do that based on https://github.com/ema2159/centaur-tabs#buffer-groups
 
 
-(use-package centaur-tabs
+(elpaca centaur-tabs (use-package centaur-tabs
   ;; :ensure
   :demand
   :config
@@ -30,12 +30,11 @@
   ("C-c g f" . centaur-tabs-forward-group)
   ("C-c g b" . centaur-tabs-backward-group)
   ("C-c g g" . centaur-tabs-counsel-switch-group)
-
-
-  :init
-  (centaur-tabs-group-by-projectile-project))
-
+  ;; :init
+  ;; (centaur-tabs-group-by-projectile-project)))
   ;; (setq centaur-tabs-enable-key-bindings t) )
 
+))
+  
 (provide 'tab-settings)
 ;;; tab-settings.el ends here

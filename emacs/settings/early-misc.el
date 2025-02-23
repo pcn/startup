@@ -52,10 +52,14 @@
 (winner-mode 1)
 
 ;; I want general to do lazy binding of keys with use-package
-(use-package general :demand t
-  ;; :ensure t
-  )
-(elpaca-wait)  ;; general adds a keyword to use-package, so I want it to be loaded before I try to use it with use-package, I think
+(elpaca (general :host github :repo "noctuid/general.el" :wait t)
+        (use-package general
+  :ensure t
+;; As of 2025-02-21 it seems like this allows general to be loaded before more use-package forms are evaluated
+  :demand t ))
+
+
+;; (elpaca-wait)  ;; general adds a keyword to use-package, so I want it to be loaded before I try to use it with use-package, I think
 
 
 ;; TODO: move these to the development settings file, and use-package
@@ -69,16 +73,16 @@
 ;; (add-hook 'after-init-hook 'global-company-mode)
 
 ;; Always run terraform fmt from now on
-(use-package terraform-mode
+(elpaca terraform-mode (use-package terraform-mode
 ;;  :;; ensure t
   :config
-  (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
+  (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)))
 
 ;; end
-(use-package rg
+(elpaca rg (use-package rg
   ;; :ensure t
   :config
-  (rg-enable-menu))
+  (rg-enable-menu)))
 
 
 ;; High-dpi screen means long nyan bar
@@ -89,14 +93,14 @@
 
 (global-display-line-numbers-mode 1)
 
-(use-package nyan-mode
+(elpaca nyan-mode (use-package nyan-mode
   ;; :ensure t
   :init
   (setq nyan-animate-nyancat t)
   (setq nyan-bar-length 30)
   (setq nyan-wavy-trail t)
   :config
-  (nyan-mode))
+  (nyan-mode)))
 
 ;; Windmove allows for shift-arrow key moving around windows on the screen
 ;; (windmove-default-keybindings)
@@ -259,9 +263,9 @@
 
 
 ;; ace-window for making switching windows easier and faster
-(use-package ace-window
+(elpaca ace-window (use-package ace-window
   ;; :ensure t
-  )
+  ))
 (global-set-key (kbd "M-o") 'ace-window)
 
 (server-start)
@@ -277,19 +281,23 @@
 ;; (load "fira-code") ;; best not to include the ending “.el” or “.elc”
 ;; (load "git-timemachine")
 
-(use-package smart-tab)
+(elpaca smart-tab (use-package smart-tab))
 
 
 ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/general.el"))
 ;; (require 'general)
 
-(use-package git-link)
-(use-package git-timemachine)
+(elpaca git-link (use-package git-link))
+(elpaca git-timemachine (use-package git-timemachine))
 
 
-(use-package inkpot-theme)
+(elpaca inkpot-theme 
+  (use-package inkpot-theme
+    :demand t
+    :config
+    (load-theme 'inkpot t )))
 
-(add-hook 'elpaca-after-init-hook (lambda () (load-theme 'inkpot t)))
+;; (add-hook 'elpaca-after-init-hook (lambda () (load-theme 'inkpot t)))
 
 ;; TODO: Change this to using the python-mode hooks in the python configuration
 (defun whitespace-sucks ()
@@ -315,12 +323,12 @@
 
 
 
-(use-package dumb-jump
-  :hook (xref-backend-functions . dumb-jump-xref-activate))
+(elpaca dumb-jump (use-package dumb-jump
+  :hook (xref-backend-functions . dumb-jump-xref-activate)))
 
 
-(use-package eterm-256color
-  :hook (term-mode . eterm-256color-mode))
+(elpaca eterm-256color (use-package eterm-256color
+  :hook (term-mode . eterm-256color-mode)))
 
 ;; ;; popper to help with popup buffers, from https://github.com/karthink/popper
 ;; (use-package popper
@@ -339,9 +347,9 @@
 ;;   (popper-echo-mode +1))  
 ;; ;; https://www.emacswiki.org/emacs/TrampMode
 
-(use-package dirvish
+(elpaca dirvish (use-package dirvish
   :config
-  (dirvish-override-dired-mode))
+  (dirvish-override-dired-mode)))
 
 
 (provide 'early-misc)

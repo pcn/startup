@@ -27,4 +27,4 @@ export PATH="~/.guix-profile/bin:$PATH"
 export INFOPATH="~/.guix-profile/share/info"
 
 # exec emacs --init-directory=~/.emacs.d "$@"
-exec emacs "$@"
+exec ~/emacs/30-rc1/bin/emacs "$@"

@@ -24,14 +24,14 @@
 ;;   :init
 ;;   (persp-mode))
 
-(use-package auto-complete
+(elpaca auto-complete (use-package auto-complete
   ;; :ensure t
   :init
-  (ac-config-default))
+  (ac-config-default)))
 
-(use-package whitespace-cleanup-mode
+(elpaca whitespace-cleanup-mode (use-package whitespace-cleanup-mode
   ;; :ensure t
-  )
+  ))
   
 
 (provide 'various-other-settings)

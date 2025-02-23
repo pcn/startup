@@ -34,9 +34,9 @@
 ;;   (flycheck-mode))
 
 ;; Format with black to try not to think too hard about it
-(use-package python-black
+(elpaca python-black (use-package python-black
   :demand t
-  :after python)
+  :after python))
 
 ;; (use-package smartparens-python
 ;;   :demand t
@@ -50,11 +50,11 @@
 
 
 ;; Directly from https://emacs-lsp.github.io/lsp-pyright/
-(use-package lsp-pyright
+(elpaca lsp-pyright (use-package lsp-pyright
   ;; :ensure t
   :hook (python-momde . (lambda ()
                           (require 'lsp-pyright)
-                          (lsp)))) ; or lsp-deferred?
+                          (lsp))))) ; or lsp-deferred?
   
 
 ;; More flychecking from https://github.com/lunaryorn/.emacs.d/blob/master/lisp/flycheck-virtualenv.el

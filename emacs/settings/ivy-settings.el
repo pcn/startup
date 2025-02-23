@@ -7,12 +7,12 @@
 
 ;;; Code:
 ;; ivy 0.9.0 adds some cool stuff
-(use-package ivy
+(elpaca ivy (use-package ivy
   ;; :ensure t
-  (ivy-mode 1)
-  
+;;  (ivy-mode 1)
+  :config 
   (setq ivy-use-virtual-buffers t)
-  )
+  ))
 
 (global-set-key (kbd "C-s") 'swiper)
 ;; (global-set-key "\C-r" 'swiper)
@@ -35,7 +35,8 @@
 ;;   :hook (company-mode . company-box-mode)
 ;;   :defer 0.5)
 
-(use-package all-the-icons :defer 0.5)
+(elpaca all-the-icons (use-package all-the-icons
+  :defer 0.5))
 
 ;; (setq all-the-icons-ivy-file-commands
 ;;       '(counsel-find-file counsel-file-jump counsel-recentf
@@ -67,18 +68,18 @@
 
 (setq completion-in-region-function #'ivy-completion-in-region)
 
-;; Referencing https://github.com/syl20bnr/spacemacs/issues/4207,
-;; Maybe shell startup is killing me
-;; (setq shell-file-name "/bin/sh")
-(use-package projectile
+
+;; Having trouble in emacs 30, updating config etc, trying out projction instead
+;; ;; Referencing https://github.com/syl20bnr/spacemacs/issues/4207,
+;; ;; Maybe shell startup is killing me
+;; ;; (setq shell-file-name "/bin/sh")
+(elpaca projectile (use-package projectile
   :config
   (projectile-mode +1)
-  (projectile-enable-caching t)
-  (projectile-global t)p
+  ;; (projectile-enable-caching t) ;; Causes an error as of 2025-02-21
+  ;; (projectile-global t)
   :general
-  
-  ("C-c p" 'projectile-command-map))
-
+  ("C-c p" 'projectile-command-map)))
 
 
 (defun my-ivy-completing-read (&rest args)
@@ -87,5 +88,31 @@
 
 (setq magit-completing-read-function 'my-ivy-completing-read)
 (setq projectile-completion-system 'ivy)
+
+
+;; (elpaca projection
+;;   (use-package projection
+;;     :ensure t
+;;     :hook (after-init . global-projection-hook-mode)
+;;     :config
+;;     (with-eval-after-load 'project
+;;       (require 'projection))
+;;     :config
+;;     :bind-keymap
+;;     ("C-c p" . projection-map)))
+  
+;; (elpaca projection-multi
+;;   (use-package projection-multi
+;;   :ensure t
+;;   :bind ( :map projection-prefix-map
+;;           ("RET" . projection-multi-compile))))
+
+;; (elpaca projection-multi-embark (use-package projection-multi-embark
+;;   :ensure t
+;;   :after embark
+;;   :after projection-multi
+;;   :demand t
+;;   ;; Add the projection set-command bindings to `compile-multi-embark-command-map'.
+;;   :config (projection-multi-embark-setup-command-map)))
 
 (provide 'ivy-settings)

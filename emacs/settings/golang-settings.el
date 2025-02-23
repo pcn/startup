@@ -18,7 +18,7 @@
 ;;   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 ;; (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
-(use-package go-mode
+(elpaca go-mode (use-package go-mode
  :defer t
  ;; :ensure t
  :mode ("\\.go\\'" . go-mode)
@@ -46,7 +46,7 @@
   :general 
   (:keymaps 'go-mode-map
             "M-," 'compile
-            "M-." 'godef-jump))
+            "M-." 'godef-jump)))
 
 (defun my-go-compilation-hook ()
   (when (not (get-buffer-window "*compilation*"))
@@ -77,18 +77,18 @@
 ;; "projectile" recognizes git repos (etc) as "projects" and changes settings
 ;; as you switch between them. 
 ;; (projectile-global-mode 1)
-(use-package go-projectile
+(elpaca go-projectile (use-package go-projectile
   ;; :ensure t
   :config
   (setq projectile-mode 1)
-  )
+  ))
 
 ; gotest defines a better set of error regexps for go tests, but it only
 ; enables them when using its own functions. Add them globally for use in
 ;; (use-package compile
   ;; :ensure t
 ;;   )
-(use-package gotest
+(elpaca gotest (use-package gotest
   ;; :ensure t
   :config
   (dolist (elt go-test-compilation-error-regexp-alist-alist)
@@ -96,7 +96,7 @@
   (defun prepend-go-compilation-regexps ()
     (dolist (elt (reverse go-test-compilation-error-regexp-alist))
       (add-to-list 'compilation-error-regexp-alist elt t)))
-  (add-hook 'go-mode-hook 'prepend-go-compilation-regexps))
+  (add-hook 'go-mode-hook 'prepend-go-compilation-regexps)))
 
 
 (provide 'golang-settings)

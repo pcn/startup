@@ -84,7 +84,7 @@ contains an ID, that ID will be replaced with a new one."
 (global-set-key (kbd "C-c o a") 'org-agenda)
 (global-set-key (kbd "C-c o c") 'org-capture)
 
-(use-package org
+(elpaca org (use-package org
   :after (counsel)  ;; leaning on counsel functions for indexes
   :general
   (:keymaps 'org-mode-map
@@ -93,15 +93,17 @@ contains an ID, that ID will be replaced with a new one."
   :config
   (setq org-directory "~/Dropbox/Orgmode" )
   (setq org-return-follows-link t)
-  (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO" "TOOLATE"))))
+  (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO" "TOOLATE")))))
 
 
 ;; Emacsql is a dependency of something in forge, I think, so it doesn't need to be loaded here.
 ;; (use-package emacsql)
-(use-package emacsql-sqlite )
+;; Not needed anymore? It's builtin?
+;; https://org-roam.discourse.group/t/solved-emacsql-sqlite3-no-longer-available-from-melpa/3048/2
+;; (elpaca emacsql-sqlite (use-package emacsql-sqlite ))
 
 ;; Also try to do org-roam for bidirectional links?
-(use-package org-roam
+(elpaca org-roam (use-package org-roam
   ;; :ensure t
   ;;:after (org)
   :init
@@ -125,7 +127,7 @@ contains an ID, that ID will be replaced with a new one."
   (org-roam-setup)
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
+  (require 'org-roam-protocol)))
 
 ;; This intereferes with rustic first intializing in a way that brings up the org agenda
 ;; instead of the main rust file I'm trying to load up. Ick.

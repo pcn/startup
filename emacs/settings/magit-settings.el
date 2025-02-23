@@ -16,7 +16,7 @@
 
 ;; Projectile requires sqlite3, and I think magit does too. Anyway, install this
 ;; here, it's a runtime requirement it doesn't prevent loading.
-(use-package sqlite3)
+(elpaca sqlite3 (use-package sqlite3))
 
 ;; 2023-12-19 error during startup reads:
 ;; ⛔ Emergency (magit): Magit requires ‘transient’ >= 0.5.0,
@@ -45,16 +45,19 @@
 ;; similar defect.
 
 ;; which leads to https://github.com/magit/magit/issues/5059
-(use-package transient)
+(elpaca transient (use-package transient))
 
-(use-package magit
+;; Dependency for magit, elpaca got stuck on llama, so let's remember to do this
+(elpaca llama (use-package llama))
+
+(elpaca magit (use-package magit
   ;; :ensure t
-  )
+  ))
 ;;  :init (;;(load-library "org")
 
-(use-package forge
+(elpaca forge (use-package forge
   ;; :ensure t
-  :after magit)
+  :after magit))
 (setq auth-sources '((expand-file-anme "~/.magit-forge-authinfo")))
 
 ;; For formatting commit messages with conventional-commit style
@@ -83,7 +86,7 @@
 ;;   ;; (setq blamer-commit-formmater "%s")
 ;;   )
 
-(use-package why-this)
+(elpaca why-this (use-package why-this))
 
 (provide 'magit-settings)
 ;;; clojure-settings.el ends here

@@ -6,7 +6,7 @@
 ;;; https://www.reddit.com/r/emacs/comments/12h3h3u/what_packages_do_the_cool_kids_use_these_days/
 
 ;; Enable vertico
-(use-package vertico
+(elpaca vertico (use-package vertico
   :init
   (vertico-mode)
 
@@ -45,18 +45,18 @@
   (setq enable-recursive-minibuffers t)
   :config
   (run-hooks 'local-vertico-mode-hook)
-  )
+  ))
 
 
 ;; Optionally use the `orderless' completion style.
-(use-package orderless
+(elpaca orderless (use-package orderless
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(substring orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-overrides '((file (styles partial-completion))))))
 
 
 (add-hook 'local-vertico-mode-hook
@@ -69,7 +69,7 @@
 
 ;; https://github.com/minad/corfu
 ;; Alternative to company-mode
-(use-package corfu
+(elpaca corfu :wait t (use-package corfu
   ;; Optional customizations
   ;; :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -103,7 +103,7 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
-  )
+  ))
 
 
 ;;; Code:
