@@ -17,6 +17,12 @@
 ;;   )
 (elpaca counsel (use-package counsel))
 
+;; Allo grouping ibuffer by version-control based project
+;; TODO: invoke ibuffer-vc-set-filter-groups-by-vc-roots by default, or
+;; bind that to a key
+(elpaca ibuffer-vc
+  (use-package ibuffer-vc))
+
 (elpaca lsp-treemacs (use-package lsp-treemacs
   ;; :ensure t
   :commands lsp-treemacs-errors-list))
