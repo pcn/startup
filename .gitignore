@@ -34,3 +34,6 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# For some reason I've checked out the yasnippets
+emacs/snippets
