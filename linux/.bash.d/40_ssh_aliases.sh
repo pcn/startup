@@ -92,6 +92,10 @@ function raws () {
     fi
 }
 
+[ -f /run/user/$(id -u)/keyring/ssh ] && \
+    export SSH_AUTH_SOCK=/run/user/$(id -u)/keyring/ssh
+
+
 
 # declare -x -f is a bash-ism
 # declare -x -f gshuf  # don't need this anymore, not on a mac

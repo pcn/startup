@@ -22,9 +22,9 @@ export PATH=$PATH:$HOME/bin:/usr/local/go/bin
 # Using guix instead now?
 # exec $(readlink --canonicalize /home/spacey/bin/emacs) "$@" &
 
-export PATH="~/.guix-profile/bin:$PATH"
+# export PATH="~/.guix-profile/bin:$PATH"
 #  export EMACSLOADPATH="~/.guix-profile/share/emacs/site-lisp"
-export INFOPATH="~/.guix-profile/share/info"
+# export INFOPATH="~/.guix-profile/share/info"
 
 # exec emacs --init-directory=~/.emacs.d "$@"
 exec ~/emacs/30.1/bin/emacs "$@"
