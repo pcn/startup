@@ -72,7 +72,17 @@
   ;; :ensure t
   ))
 
+(elpaca jq-format (use-package jq-format
+  :hook (json-mode . jq-format-mode)
+  :config
+  (setq jq-format-indent-width 2)))
 
+(elpaca jq-mode (use-package jq-mode
+  ;; :ensure t
+  :mode ("\\.jq\\'" . jq-mode)
+  :hook (jq-mode . jq-format-mode)
+  :config
+  (setq jq-format-indent-width 2)))
 
 ;; ;; use-package-hydra to allow hydras to be bound to
 ;; ;; use-package

@@ -4,7 +4,7 @@
 if [ "x$(type -t kubectl)" != "x" ] ; then
 
     source <(kubectl completion bash)
-    source ~/dvcs/github/kubectx/completion/*.bash
+    [ -f  ~/dvcs/github/kubectx/completion/*.bash ] &&source ~/dvcs/github/kubectx/completion/*.bash
     # alias k='docker exec k0s-controller kubectl'
     # alias mk="microk8s kubectl"
     alias k="kubectl"

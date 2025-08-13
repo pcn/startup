@@ -61,7 +61,28 @@
     (:keymaps 'prog-mode-map
               "TAB" 'my/copilot-tab-fallback)))
 
-              
+
+;; (elpaca (claude-code :host github :repo "stevemolitor/claude-code.el" :wait t)
+;;   (use-package claude-code
+;;     :config (claude-code-mode)
+;;     :general
+;;     (:keymaps 'prog-mode-map
+;;                   "C-c c" 'claude-code-command-map)))
+
+(elpaca (eat :host codeberg :repo "akib/emacs-eat" :wait t)
+  (use-package eat))
+
+(elpaca (claude-code-ide :host github :repo "manzaltu/claude-code-ide.el" :wait t)
+  (use-package claude-code-ide
+    :config
+    (claude-code-ide-emacs-tools-setup)
+    (setq claude-code-ide-terminal-backend 'eat)
+    :general
+    (:keymaps 'global
+                  "C-c C-'" 'claude-code-ide-menu)))
+
+
+
 ;; ; modify company-mode behaviors
 ;; (with-eval-after-load 'company
 ;;   ; disable inline previews

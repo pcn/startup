@@ -58,7 +58,6 @@
 ;; As of 2025-02-21 it seems like this allows general to be loaded before more use-package forms are evaluated
   :demand t ))
 
-
 ;; (elpaca-wait)  ;; general adds a keyword to use-package, so I want it to be loaded before I try to use it with use-package, I think
 
 

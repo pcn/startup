@@ -1,7 +1,7 @@
 # For netlify, install asdf
 if [ -d $HOME/.asdf ]  ; then
-   . $HOME/.asdf/asdf.sh
-   . $HOME/.asdf/completions/asdf.bash
+    export ASDF_DATA_DIR=/home/pcn/.asdf
+    export PATH="$ASDF_DATA_DIR/shims:$PATH"
     # After installing, let's log some of the things I'm using it for
     # nodejs
     # https://github.com/asdf-vm/asdf-nodejs
