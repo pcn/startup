@@ -1,5 +1,5 @@
 ;;; package --- Summary
-;;; My settings for lsp and dap and other dev prerequisites
+;;; My settings for eglot and other dev prerequisites
 
 ;;; Commentary:
 ;;;
@@ -23,9 +23,6 @@
 (elpaca ibuffer-vc
   (use-package ibuffer-vc))
 
-(elpaca lsp-treemacs (use-package lsp-treemacs
-  ;; :ensure t
-  :commands lsp-treemacs-errors-list))
 
 (elpaca marginalia (use-package marginalia
   ;; :ensure t
@@ -144,47 +141,23 @@
 ;; In case I ever invoke 'lsp-mode' again:
 ;; https://github.com/emacs-lsp/lsp-mode/issues/523
 ;; Based on https://github.com/emacs-lsp/lsp-mode#use-package
-(elpaca lsp-mode (use-package lsp-mode
-;;  :init (setq lsp-keymap-prefix "C-c l")
-  ;; :ensure t
-  :commands lsp
+;; eglot - built-in LSP client
+(use-package eglot
   :config
-  ;; :after company-lsp
-;;   (require 'lsp-clients)
-  ;; change nil to 't to enable logging of packets between emacs and the LS
-  ;; this was invaluable for debugging communication with the MS Python Language Server
-  ;; and comparing this with what vs.code is doing
-  ;; (setq lsp-enable-snippet t)
-  ;; (setq lsp-ui-doc-max-height 8)
-  ;; (setq lsp-ui-sideline-delay 2)
-  (setq lsp-print-io nil)
-  (setq lsp-idle-delay 0.500)
+  ;; Disable snippets if they cause issues
+  (setq eglot-ignored-server-capabilities '(:inlayHintProvider))
+  ;; Add any server configurations here if needed
   :hook
-  (lsp-mode . (lambda () (auto-complete-mode -1))) ;; https://stackoverflow.com/questions/29169210/how-to-disable-global-minor-mode-in-a-specified-major-mode
-  ;; (lsp-after-open . lsp-origami-enable) ;; XXX look at fixing this so I can 
-  ))
+  (eglot-managed-mode . (lambda () (auto-complete-mode -1)))
+  :bind
+  (:map eglot-mode-map
+        ("C-c l r" . eglot-rename)
+        ("C-c l f" . eglot-format-buffer)
+        ("C-c l a" . eglot-code-actions)))
 
 
-;; Use the language server protocol module when possible
-;; (with-eval-after-load 'lsp-mode
-;;     (require 'lsp-flycheck))
 
 
-;; Working off of
-;; https://github.com/daviwil/emacs-from-scratch/blob/210e517353abf4ed669bc40d4c7daf0fabc10a5c/Emacs.org
-;; And here is more documentation on what the various features are:
-;; https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
-(elpaca lsp-ui (use-package lsp-ui
-  ;; :ensure t
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-enable t)
-  (lsp-ui-doc-position 'bottom)
-  (lsp-ui-sideline-delay 2)
-  (lsp-ui-doc-show-with-cursor t)
-  ;; (lsp-ui-sideline-show-hover t)
-  ;; (lsp-ui-doc-max-height 8)
-  ))
 
 ;; flycheck with pycheckers to enable checking.
 (elpaca flycheck (use-package flycheck
@@ -218,13 +191,7 @@
 ;; Number the candidates (use M-1, M-2 etc to select completions).
 
 
-(elpaca lsp-ivy (use-package lsp-ivy
-  ;; :ensure t
-  :after lsp))
 
-;; (use-package lsp-treemacs
-;;   ;; :ensure t
-;;   :after lsp)
 
 (elpaca yasnippet-snippets (use-package yasnippet-snippets
   ;; :ensure t

@@ -49,12 +49,8 @@
 ;; (add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
 
 
-;; Directly from https://emacs-lsp.github.io/lsp-pyright/
-(elpaca lsp-pyright (use-package lsp-pyright
-  ;; :ensure t
-  :hook (python-momde . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp))))) ; or lsp-deferred?
+;; Use eglot for Python LSP support with pyright
+(add-hook 'python-mode-hook 'eglot-ensure)
   
 
 ;; More flychecking from https://github.com/lunaryorn/.emacs.d/blob/master/lisp/flycheck-virtualenv.el

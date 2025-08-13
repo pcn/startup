@@ -27,15 +27,13 @@
   (setq compilation-read-command nil)
   (setq compilation-window-height 14)
   (setq compilation-scroll-output t)
-  (setq lsp-gopls-use-placeholders t)
-  (setq lsp-gopls-hover-kind "FullDocumentation")
 
   
 ;;  (add-hook 'go-mode-hook 'custom-go-mode)
   :hook
   ;; (go-mode . compile)
   (go-mode . gotest)
-  (go-mode . lsp)
+  (go-mode . eglot-ensure)
   (go-mode . my-go-mode-hook)
   (go-mode . my-go-compilation-hook)
   (go-mode . smartparens-mode)
@@ -63,8 +61,8 @@
   ;; eldoc shows the signature of the function at point in the status bar.
   ;; (go-eldoc-setup)
   (local-set-key (kbd "M-.") #'godef-jump)
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t)
+  (add-hook 'before-save-hook #'eglot-format-buffer t t)
+  (add-hook 'before-save-hook (lambda () (eglot-code-actions nil nil "source.organizeImports" t)) t t)
 ;;   (add-hook 'before-save-hook 'gofmt-before-save)
 
   ;; extra keybindings from https://github.com/bbatsov/prelude/blob/master/modules/prelude-go.el
