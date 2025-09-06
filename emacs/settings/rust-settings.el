@@ -70,6 +70,7 @@
 ;;   (setq rustic-format-trigger 'on-save)
   :hook
   (rustic-mode . eglot-ensure)
+  ;; (rustic-mode . dap-mode) ;; Temporarily disabled to test lsp-mode loading
   (rustic-mode . smartparens-mode)
   ;; (rustic-mode . smartparens-strict-mode)
   ;; (rustic-mode . rk/rustic-mode-hook)
@@ -77,15 +78,12 @@
   ;; (rustic-mode . dap-cppmode)  ;; https://github.com/brotzeit/rustic/issues/86#issuecomment-860043715
   ;; (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?
-  :after rustic
+  :after (rustic dap-mode)
   ))
 ;; (elpaca-wait) ; - added :wait above
 
 ;; inline-docs, aka rustdoc-to-org
 ;; https://github.com/brotzeit/rustic#inline-documentation
-(elpaca helm-ag (use-package helm-ag
-  ;; :ensure t
-  ))
 
 
 ;; Rusty object notation. Why do I need this? 2023-09-28

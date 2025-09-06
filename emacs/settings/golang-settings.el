@@ -72,6 +72,10 @@
     (define-key map (kbd "C-c r t t") 'go-test-current-test)
     (define-key map (kbd "C-c r r") 'go-run)))
 
+;; Install go-projectile dependencies explicitly
+(elpaca go-guru (use-package go-guru))
+(elpaca go-rename (use-package go-rename))
+
 ;; "projectile" recognizes git repos (etc) as "projects" and changes settings
 ;; as you switch between them. 
 ;; (projectile-global-mode 1)
@@ -79,6 +83,7 @@
   ;; :ensure t
   :config
   (setq projectile-mode 1)
+  :after (go-guru go-rename)
   ))
 
 ; gotest defines a better set of error regexps for go tests, but it only

@@ -55,9 +55,14 @@
   ))
 ;;  :init (;;(load-library "org")
 
+(elpaca (cond-let :host github :repo "tarsius/cond-let" :protocol ssh)
+        (use-package cond-let))
+
 (elpaca forge (use-package forge
   ;; :ensure t
-  :after magit))
+                :after magit conf-let
+                
+                ))
 (setq auth-sources '((expand-file-anme "~/.magit-forge-authinfo")))
 
 ;; For formatting commit messages with conventional-commit style

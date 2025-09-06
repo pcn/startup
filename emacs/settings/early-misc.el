@@ -52,11 +52,23 @@
 (winner-mode 1)
 
 ;; I want general to do lazy binding of keys with use-package
-(elpaca (general :host github :repo "noctuid/general.el" :wait t)
-        (use-package general
-  :ensure t
-;; As of 2025-02-21 it seems like this allows general to be loaded before more use-package forms are evaluated
-  :demand t ))
+;; However, it needs to be loaded before use-package is evaluated
+;; so just require it here - trying to set it up with use-package
+;; causes a one-time error message that isn't necessary nd
+;; is avoided by doing it this way
+(elpaca (general :host github :repo "noctuid/general.el")
+  (require 'general))
+
+;; Also prevent loading even if somehow installed
+;; (with-eval-after-load 'lsp-mode
+;;   (error "lsp-mode should not be loaded! Using eglot instead."))
+
+;; Prevent any autoloading of lsp-mode
+;; (with-eval-after-load 'dap-mode
+;;   (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
+;;   ;; Remove lsp from auto-configure features if it exists
+;;   (when (boundp 'dap-auto-configure-features)
+;;     (setq dap-auto-configure-features (remove 'lsp dap-auto-configure-features))))
 
 ;; (elpaca-wait)  ;; general adds a keyword to use-package, so I want it to be loaded before I try to use it with use-package, I think
 
@@ -326,8 +338,6 @@
   :hook (xref-backend-functions . dumb-jump-xref-activate)))
 
 
-(elpaca eterm-256color (use-package eterm-256color
-  :hook (term-mode . eterm-256color-mode)))
 
 ;; ;; popper to help with popup buffers, from https://github.com/karthink/popper
 ;; (use-package popper

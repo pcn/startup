@@ -48,18 +48,41 @@
   (use-package copilot
     :hook prog-mode
     :config
-    (defun my/copilot-tab-fallback ()
-      "Try to complete with copilot first, falling back to default tab behavior if no completion is available."
+    (setq copilot-indentation-alist
+          '((emacs-lisp-mode . (or lisp-indent-offset 2))
+            (lisp-interaction-mode . (or lisp-indent-offset 2))
+            (lisp-mode . (or lisp-indent-offset 2))
+            (python-mode .  python-indent-offset)
+            (ruby-mode . ruby-indent-level)
+            (js-mode . js-indent-level)
+            (js2-mode . js2-basic-offset)
+            (typescript-mode . typescript-indent-level)
+            (typescript-tsx-mode . typescript-indent-level)
+            (go-mode . go-tab-width)
+            (rust-mode . rust-indent-offset)
+            (c-mode . c-basic-offset)
+            (java-mode . c-basic-offset)
+            (terraform-mode . terraform-indent-level)
+            (yaml-mode . yaml-indent-offset)
+            (json-mode . js-indent-level)))
+    
+    ;; (defun my/copilot-tab-fallback ()
+    ;;   "Try to complete with copilot first, falling back to default tab behavior if no completion is available."
+    ;;   (interactive)
+    ;;   (or (copilot-accept-completion)
+    ;;       (let ((tab-binding (keymap-lookup (current-active-maps) (kbd "TAB"))))
+    ;;         ;; Ensure we don't call ourselves recursively
+    ;;         (when (and tab-binding (not (eq tab-binding 'my/copilot-tab-fallback)))
+    ;;           (call-interactively tab-binding)))))
+    (defun my/copilot-complete-or-accept ()
+      "Command that either triggers a completion or falls back o standard tab indentation."
       (interactive)
-      (or (copilot-accept-completion)
-          (let ((tab-binding (keymap-lookup (current-active-maps) (kbd "TAB"))))
-            ;; Ensure we don't call ourselves recursively
-            (when (and tab-binding (not (eq tab-binding 'my/copilot-tab-fallback)))
-              (call-interactively tab-binding)))))
+    (unless (and copilot-mode (copilot-accept-completion))
+        (indent-for-tab-command)))
     
     :general
     (:keymaps 'prog-mode-map
-              "TAB" 'my/copilot-tab-fallback)))
+              "TAB" 'my/copilot-complete-or-accept)))
 
 
 ;; (elpaca (claude-code :host github :repo "stevemolitor/claude-code.el" :wait t)
@@ -70,13 +93,16 @@
 ;;                   "C-c c" 'claude-code-command-map)))
 
 (elpaca (eat :host codeberg :repo "akib/emacs-eat" :wait t)
-  (use-package eat))
+  (use-package eat
+    :hook
+    (eat-mode . (lambda () (display-line-numbers-mode -1)))))
 
 (elpaca (claude-code-ide :host github :repo "manzaltu/claude-code-ide.el" :wait t)
   (use-package claude-code-ide
     :config
     (claude-code-ide-emacs-tools-setup)
     (setq claude-code-ide-terminal-backend 'eat)
+    (global-auto-revert-mode 1)
     :general
     (:keymaps 'global
                   "C-c C-'" 'claude-code-ide-menu)))

@@ -28,9 +28,17 @@
   ;; :ensure t
   ))  ;; Does this play nicely with ivy/swiper?
 
-(elpaca minimap (use-package minimap
-  ;; :ensure t
-  )) ;; show a smaller view of the file being visited
+(elpaca demap (use-package demap
+  :config
+  ;; Configure demap settings
+  (setq demap-minimap-window-width 20)  ; Width of the minimap window
+  ;; Optional: Enable demap-minimap-mode globally or in specific modes
+  ;; (demap-minimap-mode 1)  ; Uncomment to enable globally
+  :bind
+  ;; Key bindings for demap
+  ("C-c m m" . demap-toggle)
+  ("C-c m v" . demap-visible)
+  )) ;; More flexible minimap alternative
 
 ;; Paren
 
@@ -154,6 +162,40 @@
         ("C-c l r" . eglot-rename)
         ("C-c l f" . eglot-format-buffer)
         ("C-c l a" . eglot-code-actions)))
+
+;; dap-mode for debugging with eglot - TEMPORARILY DISABLED to test lsp-mode loading
+;; (elpaca dap-mode (use-package dap-mode
+;;   :config
+;;   ;; Enable dap-mode features but disable lsp integration
+;;   (with-eval-after-load 'dap-mode
+;;     ;; Disable lsp integration in dap-mode
+;;     (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
+;;     (dap-auto-configure-mode 1))
+;;   ;; Optional UI features
+;;   (dap-ui-mode 1)
+;;   (dap-tooltip-mode 1)
+;;   (tooltip-mode 1)
+;;   (dap-ui-controls-mode 1)
+;;   
+;;   ;; Configure for Rust debugging
+;;   (require 'dap-lldb)
+;;   (require 'dap-gdb-lldb)
+;;   (dap-gdb-lldb-setup)
+;;   
+;;   ;; Register debug template for Rust
+;;   (dap-register-debug-template "Rust::GDB Run Configuration"
+;;                                (list :type "gdb"
+;;                                      :request "launch"
+;;                                      :name "GDB::Run"
+;;                                      :gdbpath "rust-gdb"
+;;                                      :target nil
+;;                                      :cwd nil))
+;;   :bind
+;;   (:map dap-mode-map
+;;         ("C-c d d" . dap-debug)
+;;         ("C-c d b" . dap-breakpoint-toggle)
+;;         ("C-c d l" . dap-ui-locals)
+;;         ("C-c d s" . dap-ui-sessions))))
 
 
 
@@ -410,7 +452,7 @@
   :config
   (global-treesit-auto-mode) ))
 
-;; (elpaca combobulate :host github repo: mickeynp/combobulate
+;; (elpaca combobulate :host Is github repo: mickeynp/combobulate
 ;;   (use-package combobulate
 ;;    :custom
 ;;    ;; You can customize Combobulate's key prefix here.
