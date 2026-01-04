@@ -60,8 +60,8 @@
   (require 'general))
 
 ;; Also prevent loading even if somehow installed
-;; (with-eval-after-load 'lsp-mode
-;;   (error "lsp-mode should not be loaded! Using eglot instead."))
+(with-eval-after-load 'lsp-mode
+   (error "lsp-mode should not be loaded! Using eglot instead."))
 
 ;; Prevent any autoloading of lsp-mode
 ;; (with-eval-after-load 'dap-mode
@@ -89,11 +89,16 @@
   :config
   (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)))
 
+(elpaca cue-mode (use-package cue-mode
+  ;; :ensure t
+  :mode ("\\.cue\\'" . cue-mode)))
+
 ;; end
 (elpaca rg (use-package rg
   ;; :ensure t
   :config
-  (rg-enable-menu)))
+  (rg-enable-menu)
+  (setq rg-show-header t)))
 
 
 ;; High-dpi screen means long nyan bar
@@ -206,9 +211,7 @@
 
 ;; (add-hook 'projectile-switch-project-hook 'projectile-pyenv-mode-set)
 
-;; More projectile configuration for neotree this time
-;; from  https://www.emacswiki.org/emacs/NeoTree#h5o-8
-(setq projectile-switch-project-action 'projectile-find-file)
+;; Projectile configuration moved to ivy-settings.el
 
 
 
@@ -232,23 +235,7 @@
 (global-set-key (kbd "C-c a y y") #'aya-expand)
 
 
-;; I want yasnippet to insert snippets that I store in a project so I
-;; can follow the local idiom of a book that I'm learning from.
-;; Found at https://www.reddit.com/r/emacs/comments/57i41t/projectlocal_snippets/daw67dd/
-(setq crshd--default-yas-snippet-dirs
-      '((expand-file-name "~/.emacs.d/snippets/")
-        yas-installed-snippets-dir
-        (expand-file-name "~/etc/emacs/layers/+completion/auto-completion/local/snippets")
-        (expand-file-name "~/etc/spacemacs/snippets")))
-
-(defun crshd/set-projectile-yas-dir ()
-  "Append a projectile-local YAS snippet dir to yas-snippet-dirs."
-  (interactive)
-  (let ((local-yas-dir (concat (projectile-project-root) ".snippets")))
-    (setq yas-snippet-dirs (cons local-yas-dir
-                                 crshd--default-yas-snippet-dirs))))
-
-(add-hook 'projectile-find-file-hook 'crshd/set-projectile-yas-dir)
+;; Yasnippet projectile integration moved to ivy-settings.el
 
 
 ;; Use copmany to pop up yasnippets

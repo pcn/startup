@@ -78,8 +78,18 @@
   (projectile-mode +1)
   ;; (projectile-enable-caching t) ;; Causes an error as of 2025-02-21
   ;; (projectile-global t)
+  :hook
+  (projectile-find-file . crshd/set-projectile-yas-dir)
   :general
   ("C-c p" 'projectile-command-map)))
+
+(elpaca counsel-projectile (use-package counsel-projectile
+  :after (counsel projectile)
+  :config
+  (counsel-projectile-mode +1)
+  ;; Don't set projectile-switch-project-action to avoid bypassing the dispatcher
+  ;; (setq projectile-switch-project-action 'counsel-projectile)
+  ))
 
 
 (defun my-ivy-completing-read (&rest args)
@@ -88,6 +98,20 @@
 
 (setq magit-completing-read-function 'my-ivy-completing-read)
 (setq projectile-completion-system 'ivy)
+
+;; Yasnippet integration with projectile for project-local snippets
+(setq crshd--default-yas-snippet-dirs
+      '((expand-file-name "~/.emacs.d/snippets/")
+        yas-installed-snippets-dir
+        (expand-file-name "~/etc/emacs/layers/+completion/auto-completion/local/snippets")
+        (expand-file-name "~/etc/spacemacs/snippets")))
+
+(defun crshd/set-projectile-yas-dir ()
+  "Append a projectile-local YAS snippet dir to yas-snippet-dirs."
+  (interactive)
+  (let ((local-yas-dir (concat (projectile-project-root) ".snippets")))
+    (setq yas-snippet-dirs (cons local-yas-dir
+                                 crshd--default-yas-snippet-dirs))))
 
 
 ;; (elpaca projection

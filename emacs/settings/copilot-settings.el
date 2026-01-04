@@ -1,8 +1,8 @@
 ;;; package --- Summary
-;;; Settings for using github copilot 
+;;; Settings for using github copilot and other ai coding assist tools
 
 ;;; Commentary:
-;;; Use a module to enable copilot
+;;; Use a module to LLMs in emacs
 
 
 ;;; Code:
@@ -48,32 +48,7 @@
   (use-package copilot
     :hook prog-mode
     :config
-    (setq copilot-indentation-alist
-          '((emacs-lisp-mode . (or lisp-indent-offset 2))
-            (lisp-interaction-mode . (or lisp-indent-offset 2))
-            (lisp-mode . (or lisp-indent-offset 2))
-            (python-mode .  python-indent-offset)
-            (ruby-mode . ruby-indent-level)
-            (js-mode . js-indent-level)
-            (js2-mode . js2-basic-offset)
-            (typescript-mode . typescript-indent-level)
-            (typescript-tsx-mode . typescript-indent-level)
-            (go-mode . go-tab-width)
-            (rust-mode . rust-indent-offset)
-            (c-mode . c-basic-offset)
-            (java-mode . c-basic-offset)
-            (terraform-mode . terraform-indent-level)
-            (yaml-mode . yaml-indent-offset)
-            (json-mode . js-indent-level)))
-    
-    ;; (defun my/copilot-tab-fallback ()
-    ;;   "Try to complete with copilot first, falling back to default tab behavior if no completion is available."
-    ;;   (interactive)
-    ;;   (or (copilot-accept-completion)
-    ;;       (let ((tab-binding (keymap-lookup (current-active-maps) (kbd "TAB"))))
-    ;;         ;; Ensure we don't call ourselves recursively
-    ;;         (when (and tab-binding (not (eq tab-binding 'my/copilot-tab-fallback)))
-    ;;           (call-interactively tab-binding)))))
+    (setq copilot-indent-offset-warning-disable t)    
     (defun my/copilot-complete-or-accept ()
       "Command that either triggers a completion or falls back o standard tab indentation."
       (interactive)
@@ -85,13 +60,6 @@
               "TAB" 'my/copilot-complete-or-accept)))
 
 
-;; (elpaca (claude-code :host github :repo "stevemolitor/claude-code.el" :wait t)
-;;   (use-package claude-code
-;;     :config (claude-code-mode)
-;;     :general
-;;     (:keymaps 'prog-mode-map
-;;                   "C-c c" 'claude-code-command-map)))
-
 (elpaca (eat :host codeberg :repo "akib/emacs-eat" :wait t)
   (use-package eat
     :hook
@@ -102,12 +70,100 @@
     :config
     (claude-code-ide-emacs-tools-setup)
     (setq claude-code-ide-terminal-backend 'eat)
+    (setq claude-code-ide-focus-claude-after-ediff nil)
+    ;; Theoretically keep ediff control buffer in the same frmae
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+    ;; Dn't create a seprate buffer for the control frame
+    (setq ediff-control-frame-parameters nil)
     (global-auto-revert-mode 1)
     :general
     (:keymaps 'global
                   "C-c C-'" 'claude-code-ide-menu)))
 
 
+;; ;; ECA is a different way of interacting with/using editor plugins
+;; ;; Summary: don't like it
+;; (elpaca (eca-emacs :host github :repo "editor-code-assistant/eca-emacs" :wait t)
+;;   (use-package eca-emacs))
+
+;; For agent-shell https://github.com/xenodium/agent-shell
+(elpaca shell-maker
+  (use-package shell-maker :ensure t))
+
+(elpaca (acp :host github :repo "xenodium/acp.el" :wait t)
+  (use-package acp))
+
+;; (elpaca (agent-shell :host github :repo "xenodium/agent-shell" :wait t)
+;;   (use-package agent-shell
+;;     :config
+;;     ;; I'm trying this to anticipate needing tools like npm which I install with asdf
+;;     (setq agent-shell-make-environment-variables (agent-shell-make-environment-variables :inherit-env t))
+;;     (setq agent-shell-anthropic-authentication (agent-shell-anthropic-make-authentication :login t))
+;;     ))
+
+
+
+(elpaca dimmer
+  (use-package dimmer
+    :config
+    (dimmer-mode 1)
+    (dimmer-configure-magit)
+    (dimmer-configure-org)
+    (dimmer-configure-which-key)
+    (setq dimmer-fraction 0.3)
+    (let ((dimmer-mode-on-p))
+      (add-hook 'ediff-before-setup-hook
+                (lambda ()
+                  (setq dimmer-mode-on-p dimmer-mode)
+                  (dimmer-mode (if dimmer-mode-on-p 0 1))))
+      (add-hook 'ediff-cleanup-hook
+                (lambda ()
+                  (dimmer-mode (if dimmer-mode-on-p 1 0)))))))
+
+
+
+(elpaca (gemini-cli :host github :repo "linchen2chris/gemini-cli.el" :wait t)
+  (use-package gemini-cli
+    :config
+    (gemini-cli-mode)
+    :general
+    (:keymaps 'global
+                  "C-c g" 'gemini-cli-command-map)))
+
+
+(elpaca agent-shell
+  (use-package agent-shell
+    :ensure-system-package
+    ;; Add agent installation configs here
+    ((claude . "npm install -g @anthropic-ai/claude-code")
+     (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))))
+         
+
+;; ;; star test
+;; ;; Make the ediff buffer more noticiable for claude-code-id
+;; (defvar-local my-ediff-control-overlay nil)
+
+;; (defun my-ediff-control-focus-change ()
+;;   (when (and (boundp 'ediff-control-buffer) 
+;;              (buffer-live-p ediff-control-buffer))
+;;     (with-current-buffer ediff-control-buffer
+;;       (when my-ediff-control-overlay
+;;         (delete-overlay my-ediff-control-overlay))
+      
+;;       (setq my-ediff-control-overlay (make-overlay (point-min) (point-max)))
+      
+;;       (let ((is-focused (eq (selected-window) (get-buffer-window))))
+;;         (overlay-put my-ediff-control-overlay 'face 
+;;                     (if is-focused
+;;                         '(:background "red")
+;;                       '(:background "green")))
+        
+;;         ;; Fill the rest of the window
+;;         (overlay-put my-ediff-control-overlay 'after-string
+;;                     (propertize (make-string 50 ?\n) 
+;;                               'face (if is-focused
+;;                                       '(:background "red")
+;;                                     '(:background "green"))))))))
 
 ;; ; modify company-mode behaviors
 ;; (with-eval-after-load 'company

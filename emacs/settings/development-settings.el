@@ -24,10 +24,6 @@
   (use-package ibuffer-vc))
 
 
-(elpaca marginalia (use-package marginalia
-  ;; :ensure t
-  ))  ;; Does this play nicely with ivy/swiper?
-
 (elpaca demap (use-package demap
   :config
   ;; Configure demap settings
@@ -155,6 +151,7 @@
   ;; Disable snippets if they cause issues
   (setq eglot-ignored-server-capabilities '(:inlayHintProvider))
   ;; Add any server configurations here if needed
+  (add-to-list 'eglot-server-programs '(cue-mode . ("cue" "lsp" "serve")))
   :hook
   (eglot-managed-mode . (lambda () (auto-complete-mode -1)))
   :bind

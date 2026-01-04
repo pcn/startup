@@ -34,4 +34,4 @@ export PATH=$PATH:$HOME/bin:/usr/local/go/bin
 # export INFOPATH="~/.guix-profile/share/info"
 
 # exec emacs --init-directory=~/.emacs.d "$@"
-exec ~/emacs/30.1/bin/emacs "$@"
+exec ~/emacs/30.2/bin/emacs "$@"

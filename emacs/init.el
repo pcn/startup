@@ -74,7 +74,7 @@
 (load "early-misc.el")
 (load "magit-settings")
 (load "development-settings")  ;; Lsp and dap first so other languages get its settings
-(load "ivy-settings") ;; After development settings so that lsp-ivy works
+;; (load "ivy-settings") ;; After development settings so that lsp-ivy works
 (load "vertico-settings") 
 (load "rust-settings")
 (load "python-settings")
@@ -82,13 +82,14 @@
 (load "typescript-settings")
 (load "golang-settings")
 (load "feature-settings")
-(load "tab-settings")
+;; (load "tab-settings")
 ;; (load "run-in-vterm.el")
 (load "org-mode-settings.el")
 (load "various-other-settings.el")  ;; Things I want moved out of init.el here
 (load "tramp-settings.el")
 ;; ;; (load "codeium.el")
 (load "copilot-settings.el");; 
+(load "perspective-settings") ;; Workspace management
 
 (put 'narrow-to-region 'disabled nil)
 (elpaca-process-queues)

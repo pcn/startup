@@ -93,6 +93,39 @@
 
 (elpaca why-this (use-package why-this))
 
+;; Configure ediff to use bottom split instead of separate frame/window
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq ediff-split-window-function 'split-window-below)
+
+;; Customize the window layout for ediff sessions
+(defun my/ediff-setup-windows (buffer-A buffer-B buffer-C control-buffer)
+  "Set up ediff windows with a bottom split layout."
+  (let* ((wind-A (selected-window))
+         (wind-B (split-window wind-A nil 'below))
+         (wind-C (if buffer-C (split-window wind-B nil 'right)))
+         (control-window (split-window (or wind-C wind-B) -4 'below)))
+
+    (set-window-buffer wind-A buffer-A)
+    (set-window-buffer wind-B buffer-B)
+    (when wind-C (set-window-buffer wind-C buffer-C))
+    (set-window-buffer control-window control-buffer)
+
+    ;; Make the control buffer smaller
+    (with-current-buffer control-buffer
+      (setq window-min-height 1))
+
+    ;; Return the control window
+    control-window))
+
+;; Only use custom window setup for 2-way comparisons (A/B)
+(setq ediff-window-setup-function
+      (lambda (buffer-A buffer-B buffer-C control-buffer)
+        (if buffer-C
+            ;; For 3-way merge, use default plain setup
+            (ediff-setup-windows-plain buffer-A buffer-B buffer-C control-buffer)
+          ;; For 2-way diff, use our custom bottom split
+          (my/ediff-setup-windows buffer-A buffer-B buffer-C control-buffer))))
+
 (provide 'magit-settings)
 ;;; clojure-settings.el ends here
 
