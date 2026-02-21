@@ -347,6 +347,8 @@
   :config
   (dirvish-override-dired-mode)))
 
+;; Enable right-click context menu with xref integration
+(context-menu-mode 1)
 
 (provide 'early-misc)
 ;;; lsp-settings.el ends here

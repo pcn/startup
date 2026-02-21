@@ -13,7 +13,7 @@
   (unless (equal persp-mode t)
     (persp-mode))
   :custom
-  (persp-mode-prefix-key (kbd "C-c M-p"))
+  (persp-mode-prefix-key (kbd "M-p"))
   ;; Enable perspective persistence
   (persp-state-default-file (expand-file-name "~/.emacs.d/perspective-state"))
   :hook
@@ -24,11 +24,17 @@
   (when (file-exists-p persp-state-default-file)
     (persp-state-restore persp-state-default-file))
   ;; Activate perspective mode in config after initialization
-  (persp-mode 1)))
+  (persp-mode 1)
+  ;; Allow project tracking only after full state restore
+  (setq persp--initialized t)))
 
 ;; Separate projectile known-projects per perspective
 (defvar persp--projectile-known-projects-alist nil
   "Alist mapping perspective names to their projectile-known-projects.")
+
+(defvar persp--initialized nil
+  "Non-nil after perspective state has been fully restored on startup.
+Guards against recording projects to transient startup perspectives.")
 
 (defun persp--get-perspective-projects ()
   "Get projects for current perspective."
@@ -51,6 +57,23 @@
                (file-name-nondirectory (directory-file-name project))
                persp-name))))
 
+(defun persp--kill-with-saved (orig-fun &optional name)
+  "Extend persp-kill to include saved-but-inactive perspectives.
+For active perspectives, delegates to the original ORIG-FUN.
+For saved-only perspectives, removes the entry from the saved alist."
+  (interactive
+   (let* ((active-names (persp-names))
+          (saved-names (mapcar #'car persp--projectile-known-projects-alist))
+          (all-names (delete-dups (append active-names saved-names))))
+     (list (completing-read "Kill perspective: " all-names nil t))))
+  (if (member name (persp-names))
+      (funcall orig-fun name)
+    (when (assoc name persp--projectile-known-projects-alist)
+      (setq persp--projectile-known-projects-alist
+            (assoc-delete-all name persp--projectile-known-projects-alist))
+      (persp--save-perspective-projects)
+      (message "Removed saved perspective: %s" name))))
+
 (defun persp-switch-with-saved ()
   "Switch to perspective, including saved perspectives from persp--projectile-known-projects-alist.
 This allows switching to perspectives that have been saved but are not currently active."
@@ -67,7 +90,7 @@ This allows switching to perspectives that have been saved but are not currently
 
 (defun persp--add-project-to-perspective (project)
   "Add PROJECT to current perspective's project list."
-  (when (and (bound-and-true-p persp-mode) (persp-curr))
+  (when (and persp--initialized (bound-and-true-p persp-mode) (persp-curr))
     (let* ((persp-name (persp-name (persp-curr)))
            ;; Normalize the project path to avoid duplicates
            (normalized-project (persp--normalize-project-path project))
@@ -115,10 +138,13 @@ This allows switching to perspectives that have been saved but are not currently
 
 ;; Persistence for our custom perspective-project associations
 (defun persp--save-perspective-projects ()
-  "Save perspective-project associations to file."
+  "Save perspective-project associations to file in human-readable form."
   (when persp--projectile-known-projects-alist
     (with-temp-file (expand-file-name "~/.emacs.d/perspective-projects")
-      (prin1 persp--projectile-known-projects-alist (current-buffer)))))
+      (insert ";; Perspective project associations\n")
+      (insert ";; Format: ((\"perspective-name\" \"project-path\" ...) ...)\n")
+      (insert ";; Edit freely; reload into Emacs with M-p R\n\n")
+      (pp persp--projectile-known-projects-alist (current-buffer)))))
 
 (defun persp--load-perspective-projects ()
   "Load perspective-project associations from file."
@@ -127,6 +153,12 @@ This allows switching to perspectives that have been saved but are not currently
       (with-temp-buffer
         (insert-file-contents file)
         (setq persp--projectile-known-projects-alist (read (current-buffer)))))))
+
+(defun persp-reload-perspective-projects ()
+  "Reload perspective-project associations from file into the running session."
+  (interactive)
+  (persp--load-perspective-projects)
+  (message "Perspective projects reloaded from ~/.emacs.d/perspective-projects"))
 
 ;; Hook to automatically add projects to current perspective and bind our custom function
 (with-eval-after-load 'perspective
@@ -140,10 +172,15 @@ This allows switching to perspectives that have been saved but are not currently
     ;; Load saved perspective-project associations
     (persp--load-perspective-projects)
     ;; Save perspective-project associations on exit
-    (add-hook 'kill-emacs-hook #'persp--save-perspective-projects))
+    (add-hook 'kill-emacs-hook #'persp--save-perspective-projects)
+    ;; Extend persp-kill to also handle saved-but-inactive perspectives
+    (advice-add 'persp-kill :around #'persp--kill-with-saved))
   ;; Override the default persp-switch binding to use our enhanced version
   ;; that includes saved perspectives in the completion list
-  (define-key perspective-map (kbd "s") 'persp-switch-with-saved))
+  (define-key perspective-map (kbd "s") 'persp-switch-with-saved)
+  (define-key perspective-map (kbd "a") 'projectile-add-known-project)
+  (define-key perspective-map (kbd "A") 'persp-add-buffer)
+  (define-key perspective-map (kbd "R") 'persp-reload-perspective-projects))
 
 ;; Recommendation from the perspective page to reduce the
 ;; amount of window-splitting

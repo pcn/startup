@@ -93,6 +93,7 @@ contains an ID, that ID will be replaced with a new one."
   :config
   (setq org-directory "~/Dropbox/Orgmode" )
   (setq org-return-follows-link t)
+  (setq org-export-backends '(html md odt ascii org))
   (setq org-todo-keywords '((sequence "TODO" "WAITING" "DOING" "|" "DONE" "WONTDO" "TOOLATE")))))
 
 

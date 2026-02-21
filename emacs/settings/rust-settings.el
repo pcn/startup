@@ -42,11 +42,10 @@
         ))
 
 ;; https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/#code-navigation
-(elpaca rustic :wait (use-package rustic
+(elpaca (rustic :skip-deps (lsp-mode)) :wait (use-package rustic
   :mode ((rx ".rs" string-end) . rustic-mode)
-  :init
-  ;; Disable rustic's automatic LSP integration since we're using eglot
-  (setq rustic-lsp-client nil)
+  :custom
+  (rustic-lsp-client 'eglot)
   :general
   (:keymaps 'rustic-mode-map
             "M-j" 'imenu
@@ -78,7 +77,6 @@
   ;; (rustic-mode . dap-cppmode)  ;; https://github.com/brotzeit/rustic/issues/86#issuecomment-860043715
   ;; (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?
-  :after (rustic dap-mode)
   ))
 ;; (elpaca-wait) ; - added :wait above
 

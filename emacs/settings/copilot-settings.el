@@ -42,6 +42,12 @@
 
           (call-interactively tab-binding)))))
 
+;; Get a newer track-changes than what's included in emacs
+;; copilot wants track-changes version 1.4 or newer, and I guess that
+(elpaca (track-changes :host elpa)
+  (use-package track-changes))
+
+
 (elpaca (copilot :host github :repo "copilot-emacs/copilot.el"
                  :files ("*.el")
                  :protocol ssh)
@@ -65,6 +71,11 @@
     :hook
     (eat-mode . (lambda () (display-line-numbers-mode -1)))))
 
+
+;; When using this in a terminal, C-c C-e invokes the emacs-eat terminal's
+;; ability to drop out of terminal mode for e.g. copying text using emacs'
+;; normal keystrokes. It calls this "emacs" input mode.
+;; To resume the normal "char" input mode that claude-code expsects, use C-c M-d
 (elpaca (claude-code-ide :host github :repo "manzaltu/claude-code-ide.el" :wait t)
   (use-package claude-code-ide
     :config
@@ -76,6 +87,21 @@
     ;; Dn't create a seprate buffer for the control frame
     (setq ediff-control-frame-parameters nil)
     (global-auto-revert-mode 1)
+    (defun claude-code-ide-restart-session ()
+      "Stop current Claude Code session and resume it.
+Compensates for the terminal reflow glitch (upstream bug #826) by
+restarting the CLI process with a fresh terminal state."
+      (interactive)
+      (if (claude-code-ide--has-active-session-p)
+          (let ((working-dir (claude-code-ide--get-working-directory)))
+            (claude-code-ide-stop)
+            (run-with-timer 0.5 nil
+                            (lambda ()
+                              (let ((default-directory working-dir))
+                                (claude-code-ide-resume)))))
+        (message "No active Claude Code session to restart")))
+    (transient-append-suffix 'claude-code-ide-menu "q"
+      '("R" "Restart session (stop + resume)" claude-code-ide-restart-session))
     :general
     (:keymaps 'global
                   "C-c C-'" 'claude-code-ide-menu)))
@@ -87,19 +113,27 @@
 ;;   (use-package eca-emacs))
 
 ;; For agent-shell https://github.com/xenodium/agent-shell
-(elpaca shell-maker
-  (use-package shell-maker :ensure t))
+(elpaca (shell-maker :host github :repo "xenodium/shell-maker" :wait t)
+  (use-package shell-maker))
 
 (elpaca (acp :host github :repo "xenodium/acp.el" :wait t)
   (use-package acp))
 
-;; (elpaca (agent-shell :host github :repo "xenodium/agent-shell" :wait t)
-;;   (use-package agent-shell
-;;     :config
-;;     ;; I'm trying this to anticipate needing tools like npm which I install with asdf
-;;     (setq agent-shell-make-environment-variables (agent-shell-make-environment-variables :inherit-env t))
-;;     (setq agent-shell-anthropic-authentication (agent-shell-anthropic-make-authentication :login t))
-;;     ))
+(elpaca (agent-shell :host github :repo "xenodium/agent-shell" :wait t :depends-on (shell-maker acp))  
+  (use-package agent-shell
+    :ensure-system-package
+    ((claude . "npm install -g @anthropic-ai/claude-code")
+     (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))
+    :config
+    ;; I'm trying this to anticipate needing tools like npm which I install with asdf
+    (setq agent-shell-make-environment-variables (agent-shell-make-environment-variables :inherit-env t))
+    (setq agent-shell-anthropic-authentication (agent-shell-anthropic-make-authentication :login t))
+    ;; Shell-maker config
+    (shell-maker-define-major-mode
+     'agent-shell-anthropic-claude-code-major-mode
+     "agent-shell-anthropic-claude-code"
+     (agent-shell-anthropic-claude-code-make-shell-maker-config))
+    ))
 
 
 
@@ -131,12 +165,28 @@
                   "C-c g" 'gemini-cli-command-map)))
 
 
-(elpaca agent-shell
-  (use-package agent-shell
-    :ensure-system-package
-    ;; Add agent installation configs here
-    ((claude . "npm install -g @anthropic-ai/claude-code")
-     (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))))
+
+;; This binds audio recording and transcription! It can be
+;; used with claude-code-ide!
+(elpaca (whisper :host github :repo "natrys/whisper.el" :wait t)
+  (use-package whisper
+    :bind ("C-c M-l" . whisper-run)  ;; mnemonic: C'Mere, listen
+    :config
+    (setq
+     whisper-install-directory "~/.local/share/whisper"
+     whisper-model "base"
+     whisper-language "en"
+     whsiper-translate nil
+     whisper-use-threads (/ (num-processors) 4))))
+
+
+
+;; (elpaca agent-shell
+;;   (use-package agent-shell
+;;     :ensure-system-package
+;;     ;; Add agent installation configs here
+;;     ((claude . "npm install -g @anthropic-ai/claude-code")
+;;      (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))))
          
 
 ;; ;; star test
