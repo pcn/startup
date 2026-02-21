@@ -18,7 +18,7 @@
 ;;   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 ;; (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
-(use-package go-mode
+(elpaca go-mode (use-package go-mode
  :defer t
  ;; :ensure t
  :mode ("\\.go\\'" . go-mode)
@@ -27,15 +27,13 @@
   (setq compilation-read-command nil)
   (setq compilation-window-height 14)
   (setq compilation-scroll-output t)
-  (setq lsp-gopls-use-placeholders t)
-  (setq lsp-gopls-hover-kind "FullDocumentation")
 
   
 ;;  (add-hook 'go-mode-hook 'custom-go-mode)
   :hook
   ;; (go-mode . compile)
   (go-mode . gotest)
-  (go-mode . lsp)
+  (go-mode . eglot-ensure)
   (go-mode . my-go-mode-hook)
   (go-mode . my-go-compilation-hook)
   (go-mode . smartparens-mode)
@@ -46,7 +44,7 @@
   :general 
   (:keymaps 'go-mode-map
             "M-," 'compile
-            "M-." 'godef-jump))
+            "M-." 'godef-jump)))
 
 (defun my-go-compilation-hook ()
   (when (not (get-buffer-window "*compilation*"))
@@ -63,8 +61,8 @@
   ;; eldoc shows the signature of the function at point in the status bar.
   ;; (go-eldoc-setup)
   (local-set-key (kbd "M-.") #'godef-jump)
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t)
+  (add-hook 'before-save-hook #'eglot-format-buffer t t)
+  (add-hook 'before-save-hook (lambda () (eglot-code-actions nil nil "source.organizeImports" t)) t t)
 ;;   (add-hook 'before-save-hook 'gofmt-before-save)
 
   ;; extra keybindings from https://github.com/bbatsov/prelude/blob/master/modules/prelude-go.el
@@ -74,21 +72,26 @@
     (define-key map (kbd "C-c r t t") 'go-test-current-test)
     (define-key map (kbd "C-c r r") 'go-run)))
 
+;; Install go-projectile dependencies explicitly
+(elpaca go-guru (use-package go-guru))
+(elpaca go-rename (use-package go-rename))
+
 ;; "projectile" recognizes git repos (etc) as "projects" and changes settings
 ;; as you switch between them. 
 ;; (projectile-global-mode 1)
-(use-package go-projectile
+(elpaca go-projectile (use-package go-projectile
   ;; :ensure t
   :config
   (setq projectile-mode 1)
-  )
+  :after (go-guru go-rename)
+  ))
 
 ; gotest defines a better set of error regexps for go tests, but it only
 ; enables them when using its own functions. Add them globally for use in
 ;; (use-package compile
   ;; :ensure t
 ;;   )
-(use-package gotest
+(elpaca gotest (use-package gotest
   ;; :ensure t
   :config
   (dolist (elt go-test-compilation-error-regexp-alist-alist)
@@ -96,7 +99,7 @@
   (defun prepend-go-compilation-regexps ()
     (dolist (elt (reverse go-test-compilation-error-regexp-alist))
       (add-to-list 'compilation-error-regexp-alist elt t)))
-  (add-hook 'go-mode-hook 'prepend-go-compilation-regexps))
+  (add-hook 'go-mode-hook 'prepend-go-compilation-regexps)))
 
 
 (provide 'golang-settings)

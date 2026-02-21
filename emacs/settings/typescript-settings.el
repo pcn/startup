@@ -16,7 +16,7 @@
 ;;   )
 
 ;;; typescript ide apparently? Similar to CIDER for clojure, I guess?
-(use-package tide
+(elpaca tide (use-package tide
   ;; :ensure t
   :hook 
   (typescript-mode . smartparens-strict-mode)
@@ -27,7 +27,7 @@
             "M-p s r" 'paredit-forward-slurp-sexp
             "M-p s l" 'paredit-backward-slurp-sexp
             "M-p b r" 'paredit-forward-barf-sexp
-            "M-p b l" 'paredit-backward-barf-sexp))
+            "M-p b l" 'paredit-backward-barf-sexp)))
             
 
 

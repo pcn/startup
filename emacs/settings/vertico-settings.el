@@ -5,8 +5,10 @@
 ;;; Non-default narrowing and project jumping pieces
 ;;; https://www.reddit.com/r/emacs/comments/12h3h3u/what_packages_do_the_cool_kids_use_these_days/
 
+
+;;; Code:
 ;; Enable vertico
-(use-package vertico
+(elpaca vertico (use-package vertico
   :init
   (vertico-mode)
 
@@ -45,31 +47,51 @@
   (setq enable-recursive-minibuffers t)
   :config
   (run-hooks 'local-vertico-mode-hook)
-  )
+  ))
 
 
 ;; Optionally use the `orderless' completion style.
-(use-package orderless
+(elpaca orderless (use-package orderless
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(substring orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-overrides '((file (styles partial-completion))))))
 
 
-(add-hook 'local-vertico-mode-hook
-  (lambda ()
-    ;; Additional configuration for Go mode
-    (setq projectile-enable-caching t)
-    (projectile-mode)
-    (global-set-key (kbd "C-c p") 'projectile-command-map)
-    ))
+;; Projectile configuration (moved from ivy-settings.el)
+(elpaca projectile (use-package projectile
+  :config
+  (projectile-mode +1)
+  ;; (projectile-enable-caching t) ;; Causes an error as of 2025-02-21
+  ;; (projectile-global t)
+  :hook
+  (projectile-find-file . crshd/set-projectile-yas-dir)
+  :general
+  ("C-c p" 'projectile-command-map)))
+
+;; Projectile completion system for vertico
+(setq projectile-completion-system 'default)
+
+;; Yasnippet integration with projectile for project-local snippets
+(setq crshd--default-yas-snippet-dirs
+      '((expand-file-name "~/.emacs.d/snippets/")
+        yas-installed-snippets-dir
+        (expand-file-name "~/etc/emacs/layers/+completion/auto-completion/local/snippets")
+        (expand-file-name "~/etc/spacemacs/snippets")))
+
+(defun crshd/set-projectile-yas-dir ()
+  "Append a projectile-local YAS snippet dir to yas-snippet-dirs."
+  (interactive)
+  (let ((local-yas-dir (concat (projectile-project-root) ".snippets")))
+    (setq yas-snippet-dirs (cons local-yas-dir
+                                 crshd--default-yas-snippet-dirs))))
 
 ;; https://github.com/minad/corfu
 ;; Alternative to company-mode
-(use-package corfu
+(elpaca corfu :wait t (use-package corfu
   ;; Optional customizations
   ;; :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
@@ -103,9 +125,27 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
-  )
+  ))
 
 
-;;; Code:
+;; Marginalia for richer annotations in completion
+(elpaca marginalia (use-package marginalia
+  :init
+  (marginalia-mode)))
+
+;; Consult for other enhanced commands (keeping C-h a as default for now)
+(elpaca consult (use-package consult
+  :bind
+  (("C-s" . consult-line)
+   ("C-r" . consult-line))))
+
+;; Add counsel-projectile for vertico-compatible project management
+(elpaca counsel-projectile (use-package counsel-projectile
+  :after (counsel projectile)
+  :config
+  (counsel-projectile-mode +1)
+  ;; Don't set projectile-switch-project-action to avoid bypassing the dispatcher
+  ;; (setq projectile-switch-project-action 'counsel-projectile)
+  ))
 
 (provide 'vertico-settings)

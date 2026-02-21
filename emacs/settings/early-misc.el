@@ -52,10 +52,25 @@
 (winner-mode 1)
 
 ;; I want general to do lazy binding of keys with use-package
-(use-package general :demand t
-  ;; :ensure t
-  )
-(elpaca-wait)  ;; general adds a keyword to use-package, so I want it to be loaded before I try to use it with use-package, I think
+;; However, it needs to be loaded before use-package is evaluated
+;; so just require it here - trying to set it up with use-package
+;; causes a one-time error message that isn't necessary nd
+;; is avoided by doing it this way
+(elpaca (general :host github :repo "noctuid/general.el")
+  (require 'general))
+
+;; Also prevent loading even if somehow installed
+(with-eval-after-load 'lsp-mode
+   (error "lsp-mode should not be loaded! Using eglot instead."))
+
+;; Prevent any autoloading of lsp-mode
+;; (with-eval-after-load 'dap-mode
+;;   (setq dap-auto-configure-features '(sessions locals breakpoints expressions tooltip))
+;;   ;; Remove lsp from auto-configure features if it exists
+;;   (when (boundp 'dap-auto-configure-features)
+;;     (setq dap-auto-configure-features (remove 'lsp dap-auto-configure-features))))
+
+;; (elpaca-wait)  ;; general adds a keyword to use-package, so I want it to be loaded before I try to use it with use-package, I think
 
 
 ;; TODO: move these to the development settings file, and use-package
@@ -69,16 +84,21 @@
 ;; (add-hook 'after-init-hook 'global-company-mode)
 
 ;; Always run terraform fmt from now on
-(use-package terraform-mode
+(elpaca terraform-mode (use-package terraform-mode
 ;;  :;; ensure t
   :config
-  (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
+  (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)))
+
+(elpaca cue-mode (use-package cue-mode
+  ;; :ensure t
+  :mode ("\\.cue\\'" . cue-mode)))
 
 ;; end
-(use-package rg
+(elpaca rg (use-package rg
   ;; :ensure t
   :config
-  (rg-enable-menu))
+  (rg-enable-menu)
+  (setq rg-show-header t)))
 
 
 ;; High-dpi screen means long nyan bar
@@ -89,14 +109,14 @@
 
 (global-display-line-numbers-mode 1)
 
-(use-package nyan-mode
+(elpaca nyan-mode (use-package nyan-mode
   ;; :ensure t
   :init
   (setq nyan-animate-nyancat t)
   (setq nyan-bar-length 30)
   (setq nyan-wavy-trail t)
   :config
-  (nyan-mode))
+  (nyan-mode)))
 
 ;; Windmove allows for shift-arrow key moving around windows on the screen
 ;; (windmove-default-keybindings)
@@ -191,9 +211,7 @@
 
 ;; (add-hook 'projectile-switch-project-hook 'projectile-pyenv-mode-set)
 
-;; More projectile configuration for neotree this time
-;; from  https://www.emacswiki.org/emacs/NeoTree#h5o-8
-(setq projectile-switch-project-action 'projectile-find-file)
+;; Projectile configuration moved to ivy-settings.el
 
 
 
@@ -217,23 +235,7 @@
 (global-set-key (kbd "C-c a y y") #'aya-expand)
 
 
-;; I want yasnippet to insert snippets that I store in a project so I
-;; can follow the local idiom of a book that I'm learning from.
-;; Found at https://www.reddit.com/r/emacs/comments/57i41t/projectlocal_snippets/daw67dd/
-(setq crshd--default-yas-snippet-dirs
-      '((expand-file-name "~/.emacs.d/snippets/")
-        yas-installed-snippets-dir
-        (expand-file-name "~/etc/emacs/layers/+completion/auto-completion/local/snippets")
-        (expand-file-name "~/etc/spacemacs/snippets")))
-
-(defun crshd/set-projectile-yas-dir ()
-  "Append a projectile-local YAS snippet dir to yas-snippet-dirs."
-  (interactive)
-  (let ((local-yas-dir (concat (projectile-project-root) ".snippets")))
-    (setq yas-snippet-dirs (cons local-yas-dir
-                                 crshd--default-yas-snippet-dirs))))
-
-(add-hook 'projectile-find-file-hook 'crshd/set-projectile-yas-dir)
+;; Yasnippet projectile integration moved to ivy-settings.el
 
 
 ;; Use copmany to pop up yasnippets
@@ -259,9 +261,9 @@
 
 
 ;; ace-window for making switching windows easier and faster
-(use-package ace-window
+(elpaca ace-window (use-package ace-window
   ;; :ensure t
-  )
+  ))
 (global-set-key (kbd "M-o") 'ace-window)
 
 (server-start)
@@ -277,19 +279,23 @@
 ;; (load "fira-code") ;; best not to include the ending “.el” or “.elc”
 ;; (load "git-timemachine")
 
-(use-package smart-tab)
+(elpaca smart-tab (use-package smart-tab))
 
 
 ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp/general.el"))
 ;; (require 'general)
 
-(use-package git-link)
-(use-package git-timemachine)
+(elpaca git-link (use-package git-link))
+(elpaca git-timemachine (use-package git-timemachine))
 
 
-(use-package inkpot-theme)
+(elpaca inkpot-theme 
+  (use-package inkpot-theme
+    :demand t
+    :config
+    (load-theme 'inkpot t )))
 
-(add-hook 'elpaca-after-init-hook (lambda () (load-theme 'inkpot t)))
+;; (add-hook 'elpaca-after-init-hook (lambda () (load-theme 'inkpot t)))
 
 ;; TODO: Change this to using the python-mode hooks in the python configuration
 (defun whitespace-sucks ()
@@ -315,12 +321,10 @@
 
 
 
-(use-package dumb-jump
-  :hook (xref-backend-functions . dumb-jump-xref-activate))
+(elpaca dumb-jump (use-package dumb-jump
+  :hook (xref-backend-functions . dumb-jump-xref-activate)))
 
 
-(use-package eterm-256color
-  :hook (term-mode . eterm-256color-mode))
 
 ;; ;; popper to help with popup buffers, from https://github.com/karthink/popper
 ;; (use-package popper
@@ -339,10 +343,12 @@
 ;;   (popper-echo-mode +1))  
 ;; ;; https://www.emacswiki.org/emacs/TrampMode
 
-(use-package dirvish
+(elpaca dirvish (use-package dirvish
   :config
-  (dirvish-override-dired-mode))
+  (dirvish-override-dired-mode)))
 
+;; Enable right-click context menu with xref integration
+(context-menu-mode 1)
 
 (provide 'early-misc)
 ;;; lsp-settings.el ends here

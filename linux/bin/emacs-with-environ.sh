@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+# name: emacs with environment set 
+# icon: text-editor
+# description: Launch Emacs with the environment set up for development
+# keywoards: emacs, development, environment
+
+# symlink this into ~/bin and ~/.local/share/pop-launcher/scripts
 set -e -o pipefail
 # Run from .local/share/applications/emacs.desktop
 
@@ -22,9 +29,9 @@ export PATH=$PATH:$HOME/bin:/usr/local/go/bin
 # Using guix instead now?
 # exec $(readlink --canonicalize /home/spacey/bin/emacs) "$@" &
 
-export PATH="~/.guix-profile/bin:$PATH"
+# export PATH="~/.guix-profile/bin:$PATH"
 #  export EMACSLOADPATH="~/.guix-profile/share/emacs/site-lisp"
-export INFOPATH="~/.guix-profile/share/info"
+# export INFOPATH="~/.guix-profile/share/info"
 
 # exec emacs --init-directory=~/.emacs.d "$@"
-exec emacs "$@"
+exec ~/emacs/30.2/bin/emacs "$@"
