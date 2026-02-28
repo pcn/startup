@@ -275,8 +275,8 @@
 
 ;; Found this on reddit, to provide a yas snippet dir in local projectile projects
 ;; https://www.reddit.com/r/emacs/comments/57i41t/projectlocal_snippets/
-(setq crshd--default-yas-snippet-dirs '("~/.emacs.d/snippets/"
-                                        yas-installed-snippets-dir ))
+(setq crshd--default-yas-snippet-dirs (list (expand-file-name "~/.emacs.d/snippets/")
+                                            #'yas-installed-snippets-dir))
 
 (defun crshd/set-projectile-yas-dir ()
   "Append a projectile-local YAS snippet dir to yas-snippet-dirs."

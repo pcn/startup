@@ -139,13 +139,4 @@
   (("C-s" . consult-line)
    ("C-r" . consult-line))))
 
-;; Add counsel-projectile for vertico-compatible project management
-(elpaca counsel-projectile (use-package counsel-projectile
-  :after (counsel projectile)
-  :config
-  (counsel-projectile-mode +1)
-  ;; Don't set projectile-switch-project-action to avoid bypassing the dispatcher
-  ;; (setq projectile-switch-project-action 'counsel-projectile)
-  ))
-
 (provide 'vertico-settings)

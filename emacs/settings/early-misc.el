@@ -345,7 +345,8 @@
 
 (elpaca dirvish (use-package dirvish
   :config
-  (dirvish-override-dired-mode)))
+  (dirvish-override-dired-mode)
+  (dirvish-side-follow-mode 1)))
 
 ;; Enable right-click context menu with xref integration
 (context-menu-mode 1)

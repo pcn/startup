@@ -110,15 +110,39 @@ This allows switching to perspectives that have been saved but are not currently
   "Show a custom dispatcher for project actions after selecting PROJECT."
   (let ((default-directory project)
         (project-name (file-name-nondirectory (directory-file-name project))))
-    (message "Project: %s | [f]ind file  [d]irectory  [b]uffer  [r]oot  [RET]search | " project-name)
+    (message "Project: %s | [f]ind file  [d]irectory  [b]uffer  [r]oot  [RET]find file | " project-name)
     (let ((key (read-key)))
       (cond
-       ((eq key ?f) (counsel-projectile-find-file))
-       ((eq key ?d) (counsel-projectile-find-dir))
-       ((eq key ?b) (counsel-projectile-switch-to-buffer))
-       ((eq key ?r) (projectile-dired))
-       ((or (eq key ?\r) (eq key ?\n)) (counsel-projectile))
+       ((eq key ?f) (projectile-find-file))
+       ((eq key ?d) (projectile-find-dir))
+       ((eq key ?b) (projectile-switch-to-buffer))
+       ((eq key ?r) (dirvish-side))
+       ((or (eq key ?\r) (eq key ?\n)) (projectile-find-file))
        (t (message "Invalid key. Use f/d/b/r/RET"))))))
+
+(defun persp--current-dir-in-perspective-p ()
+  "Return non-nil if current buffer's project root is in the current perspective."
+  (when-let ((projects (persp--get-perspective-projects)))
+    (let ((current-root (ignore-errors (projectile-project-root))))
+      (and current-root
+           (seq-some (lambda (project)
+                       (string= (persp--normalize-project-path current-root)
+                                (persp--normalize-project-path project)))
+                     projects)))))
+
+(defun persp--maybe-switch-to-project ()
+  "Offer to switch to a perspective project if current buffer is not in one."
+  (when (and persp--initialized
+             (bound-and-true-p persp-mode)
+             (persp-curr))
+    (let ((projects (persp--get-perspective-projects)))
+      (when (and projects
+                 (not (persp--current-dir-in-perspective-p)))
+        (when (y-or-n-p
+               (format "Not in a '%s' perspective project. Switch to one? "
+                       (persp-name (persp-curr))))
+          (let ((project (completing-read "Switch to project: " projects nil t)))
+            (persp--project-action-dispatcher project)))))))
 
 ;; Custom perspective-aware project switching
 (defun persp-projectile-switch-project (&optional arg)
@@ -128,9 +152,8 @@ This allows switching to perspectives that have been saved but are not currently
       ;; In perspective mode - use perspective-specific projects
       (let ((projects (persp--get-perspective-projects)))
         (if projects
-            (projectile-completing-read
-             "Switch to project: " projects
-             :action #'persp--project-action-dispatcher)
+            (let ((project (completing-read "Switch to project: " projects nil t)))
+              (persp--project-action-dispatcher project))
           (message "No projects in current perspective '%s'. Navigate to project directories to add them."
                    (persp-name (persp-curr)))))
     ;; Not in perspective mode - use normal projectile behavior
@@ -175,12 +198,14 @@ This allows switching to perspectives that have been saved but are not currently
     (add-hook 'kill-emacs-hook #'persp--save-perspective-projects)
     ;; Extend persp-kill to also handle saved-but-inactive perspectives
     (advice-add 'persp-kill :around #'persp--kill-with-saved))
+  ;; After switching perspectives, offer to jump to a project if not already in one
+  (add-hook 'persp-switch-hook #'persp--maybe-switch-to-project)
   ;; Override the default persp-switch binding to use our enhanced version
   ;; that includes saved perspectives in the completion list
   (define-key perspective-map (kbd "s") 'persp-switch-with-saved)
-  (define-key perspective-map (kbd "a") 'projectile-add-known-project)
-  (define-key perspective-map (kbd "A") 'persp-add-buffer)
-  (define-key perspective-map (kbd "R") 'persp-reload-perspective-projects))
+  (define-key perspective-map (kbd "M-n") 'projectile-add-known-project)
+  (define-key perspective-map (kbd "R") 'persp-reload-perspective-projects)
+  (define-key perspective-map (kbd "d") 'persp-remove-project-from-perspective))
 
 ;; Recommendation from the perspective page to reduce the
 ;; amount of window-splitting
