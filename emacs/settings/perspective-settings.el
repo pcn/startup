@@ -116,7 +116,7 @@ This allows switching to perspectives that have been saved but are not currently
        ((eq key ?f) (projectile-find-file))
        ((eq key ?d) (projectile-find-dir))
        ((eq key ?b) (projectile-switch-to-buffer))
-       ((eq key ?r) (dirvish-side))
+       ((eq key ?r) (ranger))
        ((or (eq key ?\r) (eq key ?\n)) (projectile-find-file))
        (t (message "Invalid key. Use f/d/b/r/RET"))))))
 
@@ -220,6 +220,30 @@ This allows switching to perspectives that have been saved but are not currently
                                   (if (fboundp 'persp-bs-show)
                                       (persp-bs-show arg)
                                     (bs-show "all"))))
+
+;; Make claude-code-ide respect perspective project boundaries.
+;; When starting a session and the current buffer's directory is not
+;; inside any perspective project, fall back to the first perspective project.
+(defun persp--get-perspective-root-for-claude ()
+  "Return the primary perspective project root when current dir is outside all perspective projects.
+Returns nil when already inside a perspective project (let claude-code-ide detect it normally),
+or when not in perspective mode / no projects configured."
+  (when (and (bound-and-true-p persp-mode) (persp-curr))
+    (let* ((projects (persp--get-perspective-projects))
+           (current-dir (expand-file-name default-directory)))
+      (when projects
+        (unless (seq-some (lambda (project)
+                            (string-prefix-p (expand-file-name project) current-dir))
+                          projects)
+          ;; Not inside any perspective project — use the most-recently-added one
+          (expand-file-name (car projects)))))))
+
+(with-eval-after-load 'claude-code-ide
+  (advice-add 'claude-code-ide--get-working-directory :around
+              (lambda (orig-fun)
+                "Fall back to perspective's primary project when current buffer is outside it."
+                (or (persp--get-perspective-root-for-claude)
+                    (funcall orig-fun)))))
 
 (provide 'perspective-settings)
 ;;; perspective-settings.el ends here
