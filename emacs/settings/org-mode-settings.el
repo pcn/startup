@@ -201,6 +201,83 @@ contains an ID, that ID will be replaced with a new one."
 
 
 
+(elpaca org-sidebar (use-package org-sidebar))
+(elpaca org-ql (use-package org-ql))
+
+
+
+;; Configuration for work todos in perspectives
+
+(defcustom pcn-org-todo-file-patterns
+  '("~/Dropbox/Orgmode/org-roam/*netlify_work_*_log.org")
+  "Glob patterns for org files containing work todos.
+Edit this list to add/remove files over time."
+  :type '(repeat string)
+  :group 'org)
+
+(defun pcn--get-org-todo-files ()
+  "Return list of existing org files matching `pcn-org-todo-file-patterns' from current year."
+  (let ((current-year (format-time-string "%Y")))
+    (seq-filter (lambda (file)
+                  ;; Only include files from current year
+                  (string-match (concat "netlify_work_" current-year "_log\\.org") file))
+                (seq-filter #'file-exists-p
+                            (mapcan (lambda (pattern)
+                                      (file-expand-wildcards (expand-file-name pattern)))
+                                    pcn-org-todo-file-patterns)))))
+
+(defun pcn-org-todo-sidebar ()
+  "Open work todo file in a side window with tree view."
+  (interactive)
+  (let ((files (pcn--get-org-todo-files)))
+    (if (not files)
+        (message "No todo files found matching pcn-org-todo-file-patterns")
+      ;; Open file in a side window
+      (let* ((file (car files))
+             (buf (or (find-buffer-visiting file)
+                      (find-file-noselect file)))
+             (win (display-buffer-in-side-window buf
+                    '((side . right)
+                      (slot . 0)
+                      (window-width . 50)))))
+        ;; Show tree sidebar and keep focus there
+        (with-selected-window win
+          (org-sidebar-tree)
+          ;; Bind C-M-tab to cycle visibility since S-TAB is unavailable
+          (local-set-key (kbd "C-M-<tab>") 'org-shifttab))
+        (message "TAB: toggle children | C-M-TAB: cycle visibility | C-x 0: close sidebar")))))
+
+;; Modeline todo count with timer refresh
+
+(defvar pcn--org-todo-modeline-string ""
+  "Cached todo count string for the modeline.")
+
+(defun pcn-org-update-todo-modeline ()
+  "Recompute todo counts and update modeline."
+  (interactive)
+  (when (require 'org-ql nil t)
+    (let* ((files (pcn--get-org-todo-files))
+           (states '("TODO" "DOING" "WAITING" "DONE"))
+           (counts (when files
+                     (mapcar (lambda (state)
+                               (let ((count (length (org-ql-select files `(todo ,state)))))
+                                 (list state count)))
+                             states))))
+      (setq pcn--org-todo-modeline-string
+            (if counts
+                (concat " ["
+                        (mapconcat (lambda (x)
+                                     (format "%s:%d" (car x) (cadr x)))
+                                   counts " ")
+                        "]")
+              "")))))
+
+;; Refresh every 5 minutes; initial run after org-ql is available
+(with-eval-after-load 'org-ql
+  (run-with-timer 5 300 #'pcn-org-update-todo-modeline))
+
+;; Add to global modeline
+(add-to-list 'global-mode-string '(:eval pcn--org-todo-modeline-string) t)
 
 (provide 'org-mode-settings)
 ;;; org-mode-settings.el ends here

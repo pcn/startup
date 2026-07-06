@@ -48,22 +48,22 @@
   (use-package track-changes))
 
 
-(elpaca (copilot :host github :repo "copilot-emacs/copilot.el"
-                 :files ("*.el")
-                 :protocol ssh)
-  (use-package copilot
-    :hook prog-mode
-    :config
-    (setq copilot-indent-offset-warning-disable t)    
-    (defun my/copilot-complete-or-accept ()
-      "Command that either triggers a completion or falls back o standard tab indentation."
-      (interactive)
-    (unless (and copilot-mode (copilot-accept-completion))
-        (indent-for-tab-command)))
+;; (elpaca (copilot :host github :repo "copilot-emacs/copilot.el"
+;;                  :files ("*.el")
+;;                  :protocol ssh)
+;;   (use-package copilot
+;;     :hook prog-mode
+;;     :config
+;;     (setq copilot-indent-offset-warning-disable t)    
+;;     (defun my/copilot-complete-or-accept ()
+;;       "Command that either triggers a completion or falls back o standard tab indentation."
+;;       (interactive)
+;;     (unless (and copilot-mode (copilot-accept-completion))
+;;         (indent-for-tab-command)))
     
-    :general
-    (:keymaps 'prog-mode-map
-              "TAB" 'my/copilot-complete-or-accept)))
+;;     :general
+;;     (:keymaps 'prog-mode-map
+;;               "TAB" 'my/copilot-complete-or-accept)))
 
 
 (elpaca (eat :host codeberg :repo "akib/emacs-eat" :wait t)
@@ -80,6 +80,7 @@
   (use-package claude-code-ide
     :config
     (claude-code-ide-emacs-tools-setup)
+    (setq claude-code-ide-cli-path (expand-file-name "~/.local/bin/claude"))
     (setq claude-code-ide-terminal-backend 'eat)
     (setq claude-code-ide-focus-claude-after-ediff nil)
     ;; Theoretically keep ediff control buffer in the same frmae
@@ -102,6 +103,17 @@ restarting the CLI process with a fresh terminal state."
         (message "No active Claude Code session to restart")))
     (transient-append-suffix 'claude-code-ide-menu "q"
       '("R" "Restart session (stop + resume)" claude-code-ide-restart-session))
+    (defun my/claude-code-ide-start-lmstudio ()
+      "Start Claude Code IDE using LM Studio at localhost:1234."
+      (interactive)
+      (let ((process-environment (append
+                                   '("ANTHROPIC_BASE_URL=http://localhost:1234"
+                                     "ANTHROPIC_API_KEY=sk-lm-y8VnzGyn:0YIvaW7JEZPyz7dT2yxg")
+                                   process-environment))
+            (claude-code-ide-cli-extra-flags "--model google/gemma-4-26b-a4b"))
+        (call-interactively #'claude-code-ide)))
+    (transient-append-suffix 'claude-code-ide-menu "R"
+      '("L" "Start with LM Studio (localhost:1234)" my/claude-code-ide-start-lmstudio))
     :general
     (:keymaps 'global
                   "C-c C-'" 'claude-code-ide-menu)))
@@ -112,28 +124,39 @@ restarting the CLI process with a fresh terminal state."
 ;; (elpaca (eca-emacs :host github :repo "editor-code-assistant/eca-emacs" :wait t)
 ;;   (use-package eca-emacs))
 
-;; For agent-shell https://github.com/xenodium/agent-shell
-(elpaca (shell-maker :host github :repo "xenodium/shell-maker" :wait t)
-  (use-package shell-maker))
+;; ;; ;; For agent-shell https://github.com/xenodium/agent-shell
+;; (elpaca (shell-maker :host github :repo "https://github.com/xenodium/shell-maker" :wait t)
+;;   (use-package shell-maker))
 
-(elpaca (acp :host github :repo "xenodium/acp.el" :wait t)
-  (use-package acp))
+;; (elpaca (agent-shell :host melpa)
+;;   (use-package agent-shell
+;;     :after shell-maker))
 
-(elpaca (agent-shell :host github :repo "xenodium/agent-shell" :wait t :depends-on (shell-maker acp))  
-  (use-package agent-shell
-    :ensure-system-package
-    ((claude . "npm install -g @anthropic-ai/claude-code")
-     (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))
-    :config
-    ;; I'm trying this to anticipate needing tools like npm which I install with asdf
-    (setq agent-shell-make-environment-variables (agent-shell-make-environment-variables :inherit-env t))
-    (setq agent-shell-anthropic-authentication (agent-shell-anthropic-make-authentication :login t))
-    ;; Shell-maker config
-    (shell-maker-define-major-mode
-     'agent-shell-anthropic-claude-code-major-mode
-     "agent-shell-anthropic-claude-code"
-     (agent-shell-anthropic-claude-code-make-shell-maker-config))
-    ))
+;; (elpaca (agent-shell-sidebar :host github :repo "https://github.com/cmacrae/agent-shell-sidebar" :wait t)
+;;   (use-package agent-shell-sidebar
+;;     :after agent-shell))
+
+;; (elpaca (shell-maker :host github :repo "xenodium/shell-maker" :wait t)
+;;   (use-package shell-maker))
+
+;; (elpaca (acp :host github :repo "xenodium/acp.el" :wait t)
+;;   (use-package acp))
+
+;; (elpaca (agent-shell :host github :repo "xenodium/agent-shell" :wait t :depends-on (shell-maker acp))  
+;;   (use-package agent-shell
+;;     :ensure-system-package
+;;     ((claude . "npm install -g @anthropic-ai/claude-code")
+;;      (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))
+;;     :config
+;;     ;; I'm trying this to anticipate needing tools like npm which I install with asdf
+;;     (setq agent-shell-make-environment-variables (agent-shell-make-environment-variables :inherit-env t))
+;;     (setq agent-shell-anthropic-authentication (agent-shell-anthropic-make-authentication :login t))
+;;     ;; Shell-maker config
+;;     (shell-maker-define-major-mode
+;;      'agent-shell-anthropic-claude-code-major-mode
+;;      "agent-shell-anthropic-claude-code"
+;;      (agent-shell-anthropic-claude-code-make-shell-maker-config))
+;;     ))
 
 
 
@@ -156,13 +179,13 @@ restarting the CLI process with a fresh terminal state."
 
 
 
-(elpaca (gemini-cli :host github :repo "linchen2chris/gemini-cli.el" :wait t)
-  (use-package gemini-cli
-    :config
-    (gemini-cli-mode)
-    :general
-    (:keymaps 'global
-                  "C-c g" 'gemini-cli-command-map)))
+;; (elpaca (gemini-cli :host github :repo "linchen2chris/gemini-cli.el" :wait t)
+;;   (use-package gemini-cli
+;;     :config
+;;     (gemini-cli-mode)
+;;     :general
+;;     (:keymaps 'global
+;;                   "C-c g" 'gemini-cli-command-map)))
 
 
 

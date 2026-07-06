@@ -343,9 +343,9 @@
 ;;   (popper-echo-mode +1))  
 ;; ;; https://www.emacswiki.org/emacs/TrampMode
 
-(elpaca ranger (use-package ranger
-  :config
-  (ranger-override-dired-mode t)))
+;; (elpaca ranger (use-package ranger
+;;   :config
+;;   (ranger-override-dired-mode 0)))
 
 ;; Enable right-click context menu with xref integration
 (context-menu-mode 1)

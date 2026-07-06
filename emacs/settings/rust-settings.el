@@ -59,10 +59,15 @@
             "C-c C-c h" 'eldoc ;; Show docs for function
             "C-c C-c C-r" 'rustic-cargo-run  ;; Reverting to defaults - be explicit until next restart            
             "C-c C-c C-t" nil
+            "M-p s r" 'paredit-forward-slurp-sexp
+            "M-p s l" 'paredit-backward-slurp-sexp
+            "M-p b r" 'paredit-forward-barf-sexp
+            "M-p b l" 'paredit-backward-barf-sexp
             "C-c C-c C-t t" 'rustic-cargo-test  ;; Reverting to defaults - be explicit until next restart
             "C-c C-c C-b"  'rustic-cargo-build ;; Reverting to defaults - be explicit until next restart
             "C-c C-c C-t r" 'rustic-cargo-test-run
-            "C-c C-c C-t l" 'pcn-cargo-test-file-local)
+            "C-c C-c C-t l" 'pcn-cargo-test-file-local
+            "C-c C-c C-p" 'pcn-compile-select)
 ;;  :mode ("\\.rs?\\" . rustic)
 ;;  :config
 ;;   (setq lsp-rust-analyzer-proc-macro-enable t)
@@ -102,6 +107,15 @@
 ;; set a local variable, e.g.
 ;; // -*- mode: rustic; cargo-test-less-arguments: "--test matrix"
 ;; for e.g.
+(defun pcn-compile-select ()
+  "Run ./your_program.sh with an argument set chosen from `pcn-compile-commands' in dir-locals."
+  (interactive)
+  (let* ((commands (buffer-local-value 'pcn-compile-commands (current-buffer)))
+         (choice (completing-read "Test: " (mapcar #'car commands) nil t))
+         (args (cdr (assoc choice commands)))
+         (root (project-root (project-current))))
+    (compile (concat "cd " root " && ./your_program.sh " args))))
+
 (defun pcn-cargo-test-file-local ()
   "Run 'cargo test' via rustic-cargo-test-run with the buffer-local `cargo-test-arguments' variable.
 The intent is to place e.g. this at the top of the file: // -*- mode: rustic; cargo-test-arguments: \"--test matrix\" -*-

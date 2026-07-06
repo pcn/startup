@@ -126,3 +126,7 @@ complete -C '/home/pcn/.asdf/shims/aws_completer' aws
 complete -C 
 complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
 complete -C 
+complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
+complete -C 
+complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
+complete -C 

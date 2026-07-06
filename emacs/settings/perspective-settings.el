@@ -13,7 +13,7 @@
   (unless (equal persp-mode t)
     (persp-mode))
   :custom
-  (persp-mode-prefix-key (kbd "M-p"))
+  (persp-mode-prefix-key (kbd "C-M-p"))
   ;; Enable perspective persistence
   (persp-state-default-file (expand-file-name "~/.emacs.d/perspective-state"))
   :hook
@@ -22,7 +22,9 @@
   :config
   ;; Load perspective state after everything is set up
   (when (file-exists-p persp-state-default-file)
-    (persp-state-restore persp-state-default-file))
+    (condition-case err
+        (persp-state-restore persp-state-default-file)
+      (error (message "perspective: failed to restore state: %s" err))))
   ;; Activate perspective mode in config after initialization
   (persp-mode 1)
   ;; Allow project tracking only after full state restore
@@ -43,9 +45,9 @@ Guards against recording projects to transient startup perspectives.")
 
 (defun persp-remove-project-from-perspective (project)
   "Remove PROJECT from current perspective's project list."
-  (interactive 
+  (interactive
    (list (projectile-completing-read
-          "Remove project from perspective: " 
+          "Remove project from perspective: "
           (persp--get-perspective-projects))))
   (when (and (bound-and-true-p persp-mode) (persp-curr))
     (let* ((persp-name (persp-name (persp-curr)))
@@ -53,7 +55,8 @@ Guards against recording projects to transient startup perspectives.")
            (updated-projects (remove project current-projects)))
       (setf (alist-get persp-name persp--projectile-known-projects-alist nil nil #'equal)
             updated-projects)
-      (message "Removed project '%s' from perspective '%s'" 
+      (persp--save-perspective-projects)
+      (message "Removed project '%s' from perspective '%s'"
                (file-name-nondirectory (directory-file-name project))
                persp-name))))
 
@@ -96,29 +99,42 @@ This allows switching to perspectives that have been saved but are not currently
            (normalized-project (persp--normalize-project-path project))
            (current-projects (alist-get persp-name persp--projectile-known-projects-alist nil nil #'equal)))
       ;; Remove any existing entries with different path formats for the same project
-      (setq current-projects 
+      (setq current-projects
             (seq-remove (lambda (existing-project)
                          (string= (persp--normalize-project-path existing-project)
                                  normalized-project))
                        current-projects))
       ;; Add the normalized version
       (setf (alist-get persp-name persp--projectile-known-projects-alist nil nil #'equal)
-            (cons normalized-project current-projects)))))
+            (cons normalized-project current-projects))
+      (persp--save-perspective-projects))))
 
 ;; Custom project action dispatcher
 (defun persp--project-action-dispatcher (project)
   "Show a custom dispatcher for project actions after selecting PROJECT."
   (let ((default-directory project)
         (project-name (file-name-nondirectory (directory-file-name project))))
-    (message "Project: %s | [f]ind file  [d]irectory  [b]uffer  [r]oot  [RET]find file | " project-name)
+    (message "Project: %s | [g]it status [f]ind file [d]irectory [b]uffer [r]oot [t]odos [c]laude [RET]find file | " project-name)
     (let ((key (read-key)))
       (cond
+       ((eq key ?g) (magit-project-status))
        ((eq key ?f) (projectile-find-file))
        ((eq key ?d) (projectile-find-dir))
        ((eq key ?b) (projectile-switch-to-buffer))
-       ((eq key ?r) (ranger))
-       ((or (eq key ?\r) (eq key ?\n)) (projectile-find-file))
-       (t (message "Invalid key. Use f/d/b/r/RET"))))))
+       ((eq key ?r) (dired project))
+       ((eq key ?t) (pcn-org-todo-sidebar))
+       ((eq key ?c)
+        (require 'claude-code-ide)
+        (dired project)
+        (if (get-buffer (claude-code-ide--get-buffer-name project))
+            (claude-code-ide-switch-to-buffer)
+          (claude-code-ide)))
+       ((or (eq key ?\r) (eq key ?\n))
+        (if (magit-toplevel project)
+            (magit-status)
+          (dired project)))
+       (t (message "Invalid key. Use g/f/d/b/r/t/c/RET"))))))
+
 
 (defun persp--current-dir-in-perspective-p ()
   "Return non-nil if current buffer's project root is in the current perspective."
@@ -167,7 +183,9 @@ This allows switching to perspectives that have been saved but are not currently
       (insert ";; Perspective project associations\n")
       (insert ";; Format: ((\"perspective-name\" \"project-path\" ...) ...)\n")
       (insert ";; Edit freely; reload into Emacs with M-p R\n\n")
-      (pp persp--projectile-known-projects-alist (current-buffer)))))
+      (let ((print-length nil)
+            (print-level nil))
+        (pp persp--projectile-known-projects-alist (current-buffer))))))
 
 (defun persp--load-perspective-projects ()
   "Load perspective-project associations from file."
@@ -175,7 +193,8 @@ This allows switching to perspectives that have been saved but are not currently
     (when (file-exists-p file)
       (with-temp-buffer
         (insert-file-contents file)
-        (setq persp--projectile-known-projects-alist (read (current-buffer)))))))
+        (setq persp--projectile-known-projects-alist
+              (seq-filter #'consp (read (current-buffer))))))))
 
 (defun persp-reload-perspective-projects ()
   "Reload perspective-project associations from file into the running session."
@@ -200,6 +219,9 @@ This allows switching to perspectives that have been saved but are not currently
     (advice-add 'persp-kill :around #'persp--kill-with-saved))
   ;; After switching perspectives, offer to jump to a project if not already in one
   (add-hook 'persp-switch-hook #'persp--maybe-switch-to-project)
+  ;; Save perspective state after switching or creating perspectives
+  (add-hook 'persp-switch-hook (lambda () (persp-state-save persp-state-default-file)))
+  (add-hook 'persp-created-hook (lambda (&rest _) (persp-state-save persp-state-default-file)))
   ;; Override the default persp-switch binding to use our enhanced version
   ;; that includes saved perspectives in the completion list
   (define-key perspective-map (kbd "s") 'persp-switch-with-saved)

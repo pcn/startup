@@ -3,7 +3,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
+ '(package-selected-packages nil)
+ '(safe-local-variable-directories '("/home/pcn/dvcs/pcn/codecrafters-bittorrent-rust/"))
+ '(safe-local-variable-values
+   '((eval setq-local compile-command
+           (concat "cd " (project-root (project-current))
+                   " && ./your_program.sh decode l5:helloi52ee"))
+     (eval setq-local compile-command
+           (concat "cd " (project-root (project-current))
+                   " && ./your_bittorrent.sh decode l5:helloi52ee")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
