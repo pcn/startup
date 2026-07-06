@@ -120,3 +120,8 @@ fi
 for f in $(ls ~/.bash.d/??-*.sh | sort -n) ; do
     source $f
 done
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/pcn/.lmstudio/bin"
+# End of LM Studio CLI section
+

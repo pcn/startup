@@ -113,9 +113,9 @@
 
 ;; inline-docs, aka rustdoc-to-org
 ;; https://github.com/brotzeit/rustic#inline-documentation
-(elpaca helm-ag (use-package helm-ag
-  ;; :ensure t
-  ))
+;; (elpaca helm-ag (use-package helm-ag
+;;   ;; :ensure t
+;;   ))
 
 
 ;; Rusty object notation. Why do I need this? 2023-09-28
