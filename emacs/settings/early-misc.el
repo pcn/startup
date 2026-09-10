@@ -30,17 +30,35 @@
 (add-hook 'elpaca-after-init-hook (lambda () (load custom-file)))
 
 
+;; xenia monofont -- https://github.com/Loretta1982/xenia
+;; Install with startup/linux/bin/install-xenia-font.sh, which clones the font
+;; repo into ~/dvcs/pcn/xenia and points fontconfig at it.
+;;
+;; The family name is lowercase "xenia". Weight selection only works because
+;; the install script teaches fontconfig the real weights: every xenia .ttf
+;; ships with OS/2 usWeightClass=400, so without that fixup all five faces
+;; look identical to fontconfig and :weight is ignored. If a weight below
+;; renders as the wrong face, re-run install-xenia-font.sh.
+;;
+;; semibold as the default face; the regular face is thin enough to be hard to
+;; read at this size. Bold still resolves to the genuinely heavier xenia Bold,
+;; so bold text stays distinguishable. Available, lightest to heaviest:
+;; light, normal, medium, semibold, bold.
+;;
+;; The font-family-list guard keeps init working on a machine where the font
+;; is not installed yet -- set-face-attribute on a missing family signals, and
+;; a signal here would abort the rest of the settings load.
+(when (member "xenia" (font-family-list))
+  (set-face-attribute 'default nil :family "xenia" :weight 'semibold :height 120)
+  (set-face-attribute 'fixed-pitch nil :family "xenia" :weight 'semibold)
+  ;; xenia has 700+ glyphs but does not cover the private-use area that
+  ;; all-the-icons/neotree draw from; fall back rather than render tofu.
+  (set-fontset-font t 'unicode "DejaVu Sans Mono" nil 'append))
+
 ;; Fira has become a pita; the glyphs it provides just don't seem to be useful 90% of the time
-;; Note- set the fira font in ~/.fonts via instructions in
+;; Kept for reference: it needed a manual build in ~/.fonts per
 ;; https://github.com/johnw42/fira-code-emacs/blob/master/fira-code.el
-;; the use of the custom ligatures need to be activated via `fira-code-mode`
-;; in individual buffers unless/until I make it automatic
-;; (custom-set-faces
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(default ((t (:weight normal :width normal :family "FiraEmacs")))))
+;; and its ligatures only applied in buffers where `fira-code-mode' was on.
 
 
 ;; https://orgmode.org/worg/org-tutorials/org4beginners.html

@@ -42,15 +42,22 @@
 ;;   :demand t
 ;;   :ensure t)
 
-(add-hook 'python-mode-hook #'(lambda () (setq flycheck-checker 'python-pylint)))
+;; Hooked onto both python-mode and python-ts-mode: treesit-auto remaps
+;; python-mode -> python-ts-mode now that the Python grammar is installed, and
+;; python-mode-hook then never runs.
+(dolist (hook '(python-mode-hook python-ts-mode-hook))
+  (add-hook hook #'(lambda () (setq flycheck-checker 'python-pylint))))
 ;; enable
 (setq flycheck-python-pylint-executable (expand-file-name "~/bin/pylint"))
 ;; (add-to-list 'flycheck-disabled-checkers 'python-flake8)
 ;; (add-to-list 'flycheck-disabled-checkers 'flycheck-mypy)
 
 
-;; Use eglot for Python LSP support with pyright
-(add-hook 'python-mode-hook 'eglot-ensure)
+;; Use eglot for Python LSP support with pyright.
+;; NOTE: no pyright/pyright-langserver is installed on this machine yet, so this
+;; currently fails with "Server died" -- tracked as PROJ-002.
+(dolist (hook '(python-mode-hook python-ts-mode-hook))
+  (add-hook hook 'eglot-ensure))
   
 
 ;; More flychecking from https://github.com/lunaryorn/.emacs.d/blob/master/lisp/flycheck-virtualenv.el

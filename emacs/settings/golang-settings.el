@@ -30,21 +30,34 @@
 
   
 ;;  (add-hook 'go-mode-hook 'custom-go-mode)
-  :hook
-  ;; (go-mode . compile)
-  (go-mode . gotest)
-  (go-mode . eglot-ensure)
-  (go-mode . my-go-mode-hook)
-  (go-mode . my-go-compilation-hook)
-  (go-mode . smartparens-mode)
-  (go-mode . rainbow-delimiters-mode)
-  ;; (go-mode . fira-code-mode)
-  ;; (go-mode . (lambda () (fira-code-mode -1)))  ;; Would this work to disable the mode?
-  (go-mode . subword-mode)
-  :general 
-  (:keymaps 'go-mode-map
-            "M-," 'compile
-            "M-." 'godef-jump)))
+  :general
+  ;; M-. is deliberately NOT bound here: it stays on the global
+  ;; `xref-find-definitions', which eglot backs with gopls. It used to be bound
+  ;; to `godef-jump' both here and in my-go-mode-hook, which shadowed eglot's
+  ;; navigation with a tool that is not installed.
+  (:keymaps '(go-mode-map go-ts-mode-map)
+            "M-," 'compile)))
+
+;; Hook these onto BOTH go-mode and go-ts-mode: treesit-auto remaps go-mode ->
+;; go-ts-mode now that the Go grammar is installed, and go-mode-hook then never
+;; runs at all -- which would silently drop eglot.
+;;
+;; Two entries that used to live here are deliberately gone, because both
+;; signalled errors from the mode hook. An error in a mode hook aborts
+;; `run-mode-hooks' BEFORE it reaches `after-change-major-mode-hook', which is
+;; where `global-font-lock-mode' turns font-lock on -- so a throwing hook left
+;; Go buffers with no syntax highlighting at all, and skipped every later hook:
+;;   * `gotest' -- a package name, not a function; "Autoloading ... failed to
+;;     define function gotest" on every Go file visit.
+;;   * `my-go-compilation-hook' -- compilation window management wired to a
+;;     file-visit hook; raised "Cannot split side window" depending on layout.
+;; my-go-compilation-hook is still defined below for use from compilation.
+(dolist (hook '(go-mode-hook go-ts-mode-hook))
+  (add-hook hook #'eglot-ensure)
+  (add-hook hook #'my-go-mode-hook)
+  (add-hook hook #'smartparens-mode)
+  (add-hook hook #'rainbow-delimiters-mode)
+  (add-hook hook #'subword-mode))
 
 (defun my-go-compilation-hook ()
   (when (not (get-buffer-window "*compilation*"))
@@ -60,17 +73,17 @@
   (setq tab-width 2 indent-tabs-mode 1)
   ;; eldoc shows the signature of the function at point in the status bar.
   ;; (go-eldoc-setup)
-  (local-set-key (kbd "M-.") #'godef-jump)
   (add-hook 'before-save-hook #'eglot-format-buffer t t)
   (add-hook 'before-save-hook (lambda () (eglot-code-actions nil nil "source.organizeImports" t)) t t)
 ;;   (add-hook 'before-save-hook 'gofmt-before-save)
 
   ;; extra keybindings from https://github.com/bbatsov/prelude/blob/master/modules/prelude-go.el
-  (let ((map go-mode-map))
-    (define-key map (kbd "C-c r t p") 'go-test-current-project) ;; current package, really
-    (define-key map (kbd "C-c r t f") 'go-test-current-file)
-    (define-key map (kbd "C-c r t t") 'go-test-current-test)
-    (define-key map (kbd "C-c r r") 'go-run)))
+  ;; Bound in the buffer's local map rather than go-mode-map, so they apply
+  ;; under go-ts-mode too (go-mode-map is not active there).
+  (local-set-key (kbd "C-c r t p") 'go-test-current-project) ;; current package, really
+  (local-set-key (kbd "C-c r t f") 'go-test-current-file)
+  (local-set-key (kbd "C-c r t t") 'go-test-current-test)
+  (local-set-key (kbd "C-c r r") 'go-run))
 
 ;; Install go-projectile dependencies explicitly
 (elpaca go-guru (use-package go-guru))

@@ -64,14 +64,11 @@
             "M-p p f" 'sp-forward-sexp
             "M-p p b" 'sp-backward-sexp )))
 
-(elpaca tree-sitter (use-package tree-sitter
-  ;; :ensure t
-  :init
-  (global-tree-sitter-mode)))
-
-(elpaca tree-sitter-langs (use-package tree-sitter-langs
-  ;; :ensure t
-  ))
+;; Tree-sitter is the built-in `treesit' (see `treesit-auto' further down); the
+;; abandoned third-party `tree-sitter'/`tree-sitter-langs' packages used to be
+;; enabled here too. Running both at once meant `tree-sitter-hl-mode' took over
+;; highlighting from font-lock, so removing it returns Rust/Go to font-lock or
+;; to the native -ts- modes. Grammars live in ~/.emacs.d/tree-sitter.
 
 (elpaca jq-format (use-package jq-format
   :hook (json-mode . jq-format-mode)
@@ -445,7 +442,22 @@
 ;;     :load-path ("/home/pcn/dvcs/github/combobulate")))
 
 
+;; treesit-auto remaps e.g. go-mode -> go-ts-mode for every language whose
+;; grammar is installed. NOTE: that remap means the classic mode hooks
+;; (go-mode-hook, python-mode-hook, ...) stop running, so anything important
+;; must be hooked onto BOTH the classic and the -ts- variant. See the
+;; `dolist' hook blocks in golang-settings.el and python-settings.el.
+;;
+;; libtree-sitter on this box is 0.20.8, which supports grammar ABI 13-14 only.
+;; Grammars built from current upstream master emit ABI 15 and silently fail to
+;; load, so rust/javascript/css/c/markdown are pinned to their last ABI-14 tags
+;; in ~/.emacs.d/tree-sitter. Re-check those pins if Emacs is ever rebuilt
+;; against a newer libtree-sitter.
 (elpaca treesit-auto (use-package treesit-auto
+  :custom
+  ;; Offer to build a grammar the first time a language without one is opened,
+  ;; instead of silently falling back to the classic mode.
+  (treesit-auto-install 'prompt)
   :config
   (global-treesit-auto-mode) ))
 

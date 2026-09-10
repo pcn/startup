@@ -48,3 +48,6 @@ dist/
 build/
 .env
 .env.*
+
+# re-add linux/bin for using the xenia font
+!linux/bin

@@ -41,9 +41,18 @@
         ;; :ensure t
         ))
 
+;; `rustic-mode' derives from `rust-mode', and rust-mode derives from
+;; `rust-ts-mode' when `rust-mode-treesitter-derive' is non-nil at the time
+;; rust-mode is loaded. That is how rustic buffers get native tree-sitter
+;; highlighting; it must be set before rustic pulls in rust-mode, hence :init.
+;; This replaces the old third-party `tree-sitter-hl-mode' hook, which disabled
+;; font-lock to take over highlighting itself.
+
 ;; https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/#code-navigation
-(elpaca (rustic :skip-deps (lsp-mode)) :wait (use-package rustic
+(elpaca rustic :wait (use-package rustic
   :mode ((rx ".rs" string-end) . rustic-mode)
+  :init
+  (setq rust-mode-treesitter-derive t)
   :custom
   (rustic-lsp-client 'eglot)
   :general
@@ -78,7 +87,6 @@
   (rustic-mode . smartparens-mode)
   ;; (rustic-mode . smartparens-strict-mode)
   ;; (rustic-mode . rk/rustic-mode-hook)
-  (rustic-mode . tree-sitter-hl-mode)
   ;; (rustic-mode . dap-cppmode)  ;; https://github.com/brotzeit/rustic/issues/86#issuecomment-860043715
   ;; (rustic-mode . dap-cpptools)
   ;; (rustic-mode . dap-gdb-lldb)  ;; todo: maybe make sure that gdb and lldb are installed?

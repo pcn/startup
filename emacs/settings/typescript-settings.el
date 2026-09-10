@@ -18,12 +18,16 @@
 ;;; typescript ide apparently? Similar to CIDER for clojure, I guess?
 (elpaca tide (use-package tide
   ;; :ensure t
-  :hook 
+  :hook
+  ;; Both variants: treesit-auto remaps typescript-mode -> typescript-ts-mode
+  ;; now that the TypeScript/TSX grammars are installed.
   (typescript-mode . smartparens-strict-mode)
+  (typescript-ts-mode . smartparens-strict-mode)
+  (tsx-ts-mode . smartparens-strict-mode)
   ;; (typescript-mode . fira-code-mode)
 ;;  (typescript-mode . parinfer-rust-mode)
   :general
-  (:keymaps 'typescript-mode-map
+  (:keymaps '(typescript-mode-map typescript-ts-mode-map)
             "M-p s r" 'paredit-forward-slurp-sexp
             "M-p s l" 'paredit-backward-slurp-sexp
             "M-p b r" 'paredit-forward-barf-sexp

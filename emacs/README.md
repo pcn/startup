@@ -19,3 +19,21 @@ ln -s ~/dvcs/pcn/startup/emacs/{early-init.el,init.el,settings} .
 
 Once that's in place, a new startup of emacs should load up all of the
 required packages.
+
+# Fonts
+
+The default face uses the [xenia monofont](https://github.com/Loretta1982/xenia),
+which is not packaged. Install it with:
+
+```
+~/dvcs/pcn/startup/linux/bin/install-xenia-font.sh
+```
+
+That clones the font repo to `~/dvcs/pcn/xenia` and points fontconfig at the
+clone, so `git pull` there is enough to pick up upstream changes. It also
+writes fontconfig rules that correct the font's weight metadata -- every xenia
+.ttf ships claiming to be Regular, so without the fixup Emacs cannot tell the
+weights apart. Re-run the script if a weight renders as the wrong face.
+
+Emacs skips the font if it is not installed, so init still works on a machine
+where you have not run the script.
