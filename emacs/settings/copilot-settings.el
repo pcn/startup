@@ -101,6 +101,22 @@ restarting the CLI process with a fresh terminal state."
                               (let ((default-directory working-dir))
                                 (claude-code-ide-resume)))))
         (message "No active Claude Code session to restart")))
+    ;; claude-code-ide--sync-terminal-dimensions only calls
+    ;; `set-process-window-size', which resizes the pty but not eat's own
+    ;; emulator grid. The CLI then draws 100-column lines into an eat grid
+    ;; still at its initial 80x24, and eat wraps them at column 80. Resize
+    ;; the grid to the same dimensions the pty was given.
+    (advice-add 'claude-code-ide--sync-terminal-dimensions :after
+                (lambda (buffer window)
+                  (when (and (eq claude-code-ide-terminal-backend 'eat)
+                             (buffer-live-p buffer) (window-live-p window))
+                    (with-current-buffer buffer
+                      (when eat-terminal
+                        (let ((inhibit-read-only t))
+                          (eat-term-resize eat-terminal
+                                           (window-body-width window)
+                                           (window-body-height window))
+                          (eat-term-redisplay eat-terminal)))))))
     (transient-append-suffix 'claude-code-ide-menu "q"
       '("R" "Restart session (stop + resume)" claude-code-ide-restart-session))
     (defun my/claude-code-ide-start-lmstudio ()

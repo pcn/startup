@@ -40,20 +40,66 @@
 ;; look identical to fontconfig and :weight is ignored. If a weight below
 ;; renders as the wrong face, re-run install-xenia-font.sh.
 ;;
-;; semibold as the default face; the regular face is thin enough to be hard to
-;; read at this size. Bold still resolves to the genuinely heavier xenia Bold,
-;; so bold text stays distinguishable. Available, lightest to heaviest:
-;; light, normal, medium, semibold, bold.
+;; bold as the default face at :height 130; regular and semibold both read as
+;; too fine at this size. Available weights, lightest to heaviest: light,
+;; normal, medium, semibold, bold -- bold is the ceiling, xenia ships nothing
+;; heavier.
+;;
+;; Consequence worth knowing: with bold as the *default*, the bold face has
+;; nowhere heavier to go, so bold text no longer stands out by weight. If
+;; bold-vs-normal contrast starts to matter (font-lock keywords, org headings),
+;; step the default back to semibold and raise :height instead.
 ;;
 ;; The font-family-list guard keeps init working on a machine where the font
 ;; is not installed yet -- set-face-attribute on a missing family signals, and
 ;; a signal here would abort the rest of the settings load.
 (when (member "xenia" (font-family-list))
-  (set-face-attribute 'default nil :family "xenia" :weight 'semibold :height 120)
-  (set-face-attribute 'fixed-pitch nil :family "xenia" :weight 'semibold)
+  (set-face-attribute 'default nil :family "xenia" :weight 'bold :height 130)
+  (set-face-attribute 'fixed-pitch nil :family "xenia" :weight 'bold)
   ;; xenia has 700+ glyphs but does not cover the private-use area that
   ;; all-the-icons/neotree draw from; fall back rather than render tofu.
-  (set-fontset-font t 'unicode "DejaVu Sans Mono" nil 'append))
+  (set-fontset-font t 'unicode "DejaVu Sans Mono" nil 'append)
+  ;; Terminal UIs (Claude Code in eat especially) draw with arrows, dingbats
+  ;; and misc-technical glyphs that xenia lacks. Left to the `append' above,
+  ;; Emacs picks Noto Sans Symbols2 / Noto CJK for many of them, at 0.75-1.7
+  ;; cells wide, which pushes every such line past the terminal width and
+  ;; makes it wrap early. FreeMono covers all of them at exactly 0.6em, which
+  ;; lands on the same 10px cell as xenia at :height 130.
+  (dolist (range '((#x2039 . #x203A)    ; ‹ ›
+                   (#x2190 . #x21FF)    ; arrows
+                   (#x2300 . #x23FF)    ; misc technical: ⏺ ⎿
+                   (#x25A0 . #x25FF)    ; geometric shapes
+                   (#x2600 . #x27BF)))  ; misc symbols, dingbats: ✓ ✻ ❯ ⚠
+    (set-fontset-font t range "FreeMono" nil 'prepend)))
+
+;; --- Reverting / comparing -------------------------------------------------
+;;
+;; What was here before xenia: nothing. No font was ever set -- the Fira block
+;; below was commented out, custom-settings sets no faces, and nothing else
+;; touched `default'. Emacs used its built-in default, which resolves through
+;; fontconfig's "monospace" alias; on this machine that is DejaVu Sans Mono
+;; (check with `fc-match monospace').
+;;
+;; So to go back, comment out the (when ...) form above and change nothing
+;; else. Uncommenting the form below is NOT required -- it only pins
+;; explicitly what you would otherwise get implicitly, which is handy for an
+;; apples-to-apples comparison at the same :height.
+;;
+;; (set-face-attribute 'default nil :family "DejaVu Sans Mono" :weight 'normal :height 130)
+;;
+;; For a live A/B without restarting, eval either of these with M-: --
+;; the frame changes immediately:
+;;
+;;   (set-face-attribute 'default nil :family "xenia" :weight 'bold :height 130)
+;;   (set-face-attribute 'default nil :family "DejaVu Sans Mono" :weight 'normal :height 130)
+;;
+;; Weight is the other axis worth trying: swap 'bold for 'semibold or 'medium
+;; to go lighter. These only differ because install-xenia-font.sh repairs the
+;; font's weight metadata; see the note above. To confirm which face is
+;; actually loaded rather than which one was requested:
+;;
+;;   (font-xlfd-name (face-attribute 'default :font))
+;; ---------------------------------------------------------------------------
 
 ;; Fira has become a pita; the glyphs it provides just don't seem to be useful 90% of the time
 ;; Kept for reference: it needed a manual build in ~/.fonts per
