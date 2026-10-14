@@ -122,11 +122,3 @@ for f in $(ls ~/.bash.d/??-*.sh | sort -n) ; do
 done
 complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
 complete -C 
-complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
-complete -C 
-complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
-complete -C 
-complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
-complete -C 
-complete -C '/home/pcn/.asdf/shims/aws_completer' aws 
-complete -C 

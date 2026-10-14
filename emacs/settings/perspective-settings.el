@@ -146,9 +146,13 @@ This allows switching to perspectives that have been saved but are not currently
                                 (persp--normalize-project-path project)))
                      projects)))))
 
+(defvar persp--suppress-project-prompt nil
+  "When non-nil, `persp--maybe-switch-to-project' does nothing.")
+
 (defun persp--maybe-switch-to-project ()
   "Offer to switch to a perspective project if current buffer is not in one."
   (when (and persp--initialized
+             (not persp--suppress-project-prompt)
              (bound-and-true-p persp-mode)
              (persp-curr))
     (let ((projects (persp--get-perspective-projects)))
@@ -174,6 +178,49 @@ This allows switching to perspectives that have been saved but are not currently
                    (persp-name (persp-curr)))))
     ;; Not in perspective mode - use normal projectile behavior
     (projectile-switch-project arg)))
+
+;; Reverse lookup: project -> perspectives
+(defun persp--perspectives-for-project (project)
+  "Return the names of saved perspectives whose project list contains PROJECT."
+  (let ((normalized (persp--normalize-project-path project)))
+    (seq-keep (lambda (entry)
+                (when (seq-some (lambda (p)
+                                  (string= (persp--normalize-project-path p) normalized))
+                                (cdr entry))
+                  (car entry)))
+              persp--projectile-known-projects-alist)))
+
+(defun persp-find-project ()
+  "Pick a project, then switch to a perspective that contains it or create one.
+Projects are gathered from every perspective plus projectile's known projects,
+and each is annotated with the perspectives it is mapped into.  At the
+perspective prompt, choose an existing one or type a new name; the project is
+added to the chosen perspective if it isn't already there."
+  (interactive)
+  (let* ((projects (delete-dups
+                    (mapcar #'persp--normalize-project-path
+                            (append (mapcan (lambda (entry) (copy-sequence (cdr entry)))
+                                            persp--projectile-known-projects-alist)
+                                    (and (boundp 'projectile-known-projects)
+                                         projectile-known-projects)))))
+         (candidates (mapcar (lambda (project)
+                               (let ((persps (persp--perspectives-for-project project)))
+                                 (cons (if persps
+                                           (format "%s  [%s]" project (string-join persps ", "))
+                                         project)
+                                       project)))
+                             projects))
+         (project (cdr (assoc (completing-read "Project: " candidates nil t) candidates)))
+         (persps (persp--perspectives-for-project project))
+         (name (completing-read
+                (format "Perspective for %s (existing or new): "
+                        (file-name-nondirectory (directory-file-name project)))
+                persps nil nil nil nil
+                (or (car persps) (file-name-nondirectory (directory-file-name project))))))
+    (let ((persp--suppress-project-prompt t))
+      (persp-switch name))
+    (persp--add-project-to-perspective project)
+    (persp--project-action-dispatcher project)))
 
 ;; Persistence for our custom perspective-project associations
 (defun persp--save-perspective-projects ()
@@ -225,6 +272,7 @@ This allows switching to perspectives that have been saved but are not currently
   ;; Override the default persp-switch binding to use our enhanced version
   ;; that includes saved perspectives in the completion list
   (define-key perspective-map (kbd "s") 'persp-switch-with-saved)
+  (define-key perspective-map (kbd "o") 'persp-find-project)
   (define-key perspective-map (kbd "M-n") 'projectile-add-known-project)
   (define-key perspective-map (kbd "R") 'persp-reload-perspective-projects)
   (define-key perspective-map (kbd "d") 'persp-remove-project-from-perspective))
