@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make test*)",
+      "Bash(make lint *)",
+      "Bash(make lint-ci *)",
+      "Bash(make vet *)",
+      "Bash(make check *)",
+      "Bash(go test *)",
+      "Bash(go vet *)",
+      "Bash(go build ./...)",
+      "Bash(golangci-lint run *)",
+      "Bash(terraform validate *)",
+      "Bash(terraform fmt -check *)",
+      "Bash(npm test *)",
+      "Bash(npm run test*)",
+      "Bash(npm run lint)",
+      "Bash(pytest *)",
+      "Bash(python -m pytest *)",
+      "Bash(cargo test *)",
+      "Bash(cargo check *)",
+      "Bash(cargo clippy *)"
+    ],
+    "ask": [
+      "Bash(golangci-lint * --fix*)",
+      "Bash(cargo clippy * --fix*)"
+    ]
+  }
+}

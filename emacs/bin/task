@@ -1,0 +1,435 @@
+#!/bin/bash
+# task: manage work tasks under $TASKS_ROOT and personal ones under $PERSONAL_TASKS_ROOT.
+#
+#   task new <id> [--title "..."] [--type linear|incident|adhoc|personal]
+#   task add-repo <id> <repo-path|repo-name> [--branch name] [--link]
+#   task drop-repo <id> <repo-name>
+#   task list
+#   task archive <id>
+#
+# A task directory is its own git repo (so platypus can manage it) holding
+# task.org, CLAUDE.md and the platypus scaffold. Git worktrees and linked
+# checkouts live in its repos/ directory, which the task repo ignores. Every
+# subcommand is idempotent and says what it did.
+#
+# Personal tasks (--type personal) live in their own root and take repo names
+# from their own repos root. Other subcommands find a task in either root, so
+# ids are unique across both.
+
+set -eu -o pipefail
+
+TASKS_ROOT=${TASKS_ROOT:-$HOME/dvcs/netlify/tasks}
+REPOS_ROOT=${TASK_REPOS_ROOT:-$HOME/dvcs/netlify}
+PERSONAL_TASKS_ROOT=${PERSONAL_TASKS_ROOT:-$HOME/dvcs/pcn/tasks}
+PERSONAL_REPOS_ROOT=${PERSONAL_TASK_REPOS_ROOT:-$HOME/dvcs/pcn}
+export PATH="$HOME/.cargo/bin:$PATH"
+
+say() { echo "task: $*" ; }
+die() { echo "task: $*" >&2 ; exit 1 ; }
+usage() { sed -n '4,8p' "$0" | sed 's/^# *//' >&2 ; exit 2 ; }
+
+task_dir() {
+    local r
+    for r in "$TASKS_ROOT" "$PERSONAL_TASKS_ROOT" ; do
+        if [ -f "$r/$1/task.org" ] ; then
+            echo "$r/$1"
+            return
+        fi
+    done
+    die "no task $1 in $TASKS_ROOT or $PERSONAL_TASKS_ROOT"
+}
+
+root_for_type() {
+    if [ "$1" = personal ] ; then echo "$PERSONAL_TASKS_ROOT" ; else echo "$TASKS_ROOT" ; fi
+}
+
+# Where bare repo names given to add-repo are looked up, for task directory $1.
+repos_root_of() {
+    case "$1" in
+        "$PERSONAL_TASKS_ROOT"/*) echo "$PERSONAL_REPOS_ROOT" ;;
+        *) echo "$REPOS_ROOT" ;;
+    esac
+}
+
+# Main checkout of the repo that a checkout or worktree belongs to.
+main_checkout() {
+    dirname "$(git -C "$1" rev-parse --path-format=absolute --git-common-dir)"
+}
+
+get_prop() {
+    sed -n "s/^:$2:[[:space:]]*//p" "$1/task.org" | head -1
+}
+
+set_prop() {
+    local f="$1/task.org" line
+    line=$(printf '%-11s%s' ":$2:" "$3")
+    [ -n "$3" ] || line=":$2:"
+    awk -v k=":$2:" -v l="$line" '!done && index($0, k) == 1 { print l ; done = 1 ; next } { print }' \
+        "$f" > "$f.tmp"
+    mv "$f.tmp" "$f"
+}
+
+repos_add() {
+    local repos
+    repos=$(get_prop "$1" REPOS)
+    case " $repos " in
+        *" $2 "*) ;;
+        *) set_prop "$1" REPOS "${repos:+$repos }$2" ; say "added $2 to :REPOS:" ;;
+    esac
+}
+
+repos_remove() {
+    local repos new=""
+    repos=$(get_prop "$1" REPOS)
+    for r in $repos ; do
+        [ "$r" = "$2" ] || new="${new:+$new }$r"
+    done
+    if [ "$new" != "$repos" ] ; then
+        set_prop "$1" REPOS "$new"
+        say "removed $2 from :REPOS:"
+    fi
+}
+
+# additionalDirectories entries are written as ~/... so they match hand-written ones.
+tilde() {
+    case "$1" in
+        "$HOME"/*) echo "~${1#"$HOME"}" ;;
+        *) echo "$1" ;;
+    esac
+}
+
+settings_add_dir() {
+    local f="$1/.claude/settings.json" p
+    p=$(tilde "$2")
+    mkdir -p "$1/.claude"
+    [ -f "$f" ] || echo '{}' > "$f"
+    if jq -e --arg p "$p" '.permissions.additionalDirectories // [] | index($p)' "$f" >/dev/null ; then
+        say "$p already in .claude/settings.json additionalDirectories"
+        return
+    fi
+    jq --arg p "$p" '.permissions.additionalDirectories = ((.permissions.additionalDirectories // []) + [$p])' \
+        "$f" > "$f.tmp"
+    mv "$f.tmp" "$f"
+    say "added $p to .claude/settings.json additionalDirectories"
+}
+
+settings_remove_dir() {
+    local f="$1/.claude/settings.json" p
+    p=$(tilde "$2")
+    [ -f "$f" ] || return 0
+    jq -e --arg p "$p" '.permissions.additionalDirectories // [] | index($p)' "$f" >/dev/null || return 0
+    jq --arg p "$p" '.permissions.additionalDirectories -= [$p]' "$f" > "$f.tmp"
+    mv "$f.tmp" "$f"
+    say "removed $p from .claude/settings.json additionalDirectories"
+}
+
+# Refuse to drop a worktree that holds work existing nowhere else.
+check_clean() {
+    local name
+    name=$(basename "$1")
+    [ -z "$(git -C "$1" status --porcelain)" ] \
+        || die "$name has uncommitted or untracked changes; refusing"
+    [ -z "$(git -C "$1" rev-list -n 1 HEAD --not --remotes)" ] \
+        || die "$name has commits not pushed to any remote; refusing"
+}
+
+origin_head() {
+    local b
+    if b=$(git -C "$1" symbolic-ref -q --short refs/remotes/origin/HEAD) ; then
+        echo "$b"
+        return
+    fi
+    for b in main master ; do
+        if git -C "$1" show-ref -q --verify "refs/remotes/origin/$b" ; then
+            echo "origin/$b"
+            return
+        fi
+    done
+    die "cannot find the default branch of origin in $1"
+}
+
+slug() {
+    tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]\{1,\}/-/g' -e 's/^-//' -e 's/-$//' | cut -c1-40 | sed 's/-$//'
+}
+
+# Linear ids are bare (ENG-123), so append the title; other ids already carry a slug.
+default_branch() {
+    local id_lc
+    id_lc=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+    if [ "$(get_prop "$1" TYPE)" = linear ] ; then
+        echo "$id_lc-$(sed -n "s/^#+title: $2: //p" "$1/task.org" | slug)"
+    else
+        echo "$id_lc"
+    fi
+}
+
+write_new() {
+    if [ -e "$1" ] ; then
+        cat >/dev/null
+        say "kept existing $(basename "$1")"
+    else
+        cat > "$1"
+        say "wrote $(basename "$1")"
+    fi
+}
+
+cmd_new() {
+    local id="" title="" type="" linear=""
+    while [ $# -gt 0 ] ; do
+        case "$1" in
+            --title) title=$2 ; shift 2 ;;
+            --type) type=$2 ; shift 2 ;;
+            -*) usage ;;
+            *) [ -z "$id" ] || usage ; id=$1 ; shift ;;
+        esac
+    done
+    [ -n "$id" ] || usage
+    case "$id" in */*|.*) die "bad task id: $id" ;; esac
+    if [ -z "$type" ] ; then
+        case "$id" in
+            inc-*) type=incident ;;
+            [A-Z]*-[0-9]*) type=linear ;;
+            *) type=adhoc ;;
+        esac
+    fi
+    local context_hint="AC, issue description, relevant comments, links. For incidents: symptom, start time, impact."
+    local threads_hint="One heading per Slack thread or incident record:"
+    case "$type" in
+        linear) linear=$id ;;
+        incident|adhoc) ;;
+        personal)
+            context_hint="Goal, background, links."
+            threads_hint="One heading per conversation (email, forum, issue, chat):" ;;
+        *) die "type must be linear, incident, adhoc or personal" ;;
+    esac
+    : "${title:=$id}"
+
+    local root r
+    root=$(root_for_type "$type")
+    for r in "$TASKS_ROOT" "$PERSONAL_TASKS_ROOT" ; do
+        [ ! -e "$r/.archive/$id" ] || die "task $id is archived in $r/.archive/$id"
+        [ "$r" = "$root" ] || [ ! -e "$r/$id" ] || die "task id $id is already used in $r"
+    done
+    local d="$root/$id"
+    if [ -d "$d" ] ; then
+        say "using existing $d"
+    else
+        mkdir -p "$d"
+        say "created $d"
+    fi
+
+    write_new "$d/.task" < /dev/null
+
+    write_new "$d/CLAUDE.md" <<'EOF'
+This is a task workspace. Read ./task.org first. It holds the context, plan, PRs, threads, and log.
+repos/ holds git worktrees (or links to live checkouts) of separate repos; each may have its own CLAUDE.md.
+Log milestones with the worklog tool. Keep task.org's Plan and PRs sections current.
+EOF
+
+    write_new "$d/task.org" <<EOF
+:PROPERTIES:
+:ID:       $(uuidgen)
+:TYPE:     $type
+:LINEAR:   $linear
+:REPOS:
+:STATUS:   active
+:END:
+#+title: $id: $title
+#+filetags: :task:
+
+* Context
+  $context_hint
+
+* Plan
+  Per-repo changes, order, PR dependencies, open questions.
+
+* PRs
+  | Repo | PR | Status | Depends on |
+  |------+----+--------+------------|
+
+* Threads
+  $threads_hint
+  permalink, one-line summary, :LAST_READ: property.
+
+* Decisions
+
+* Log
+EOF
+    # An empty :LINEAR: is written without trailing spaces.
+    [ -n "$linear" ] || set_prop "$d" LINEAR ""
+
+    mkdir -p "$d/repos"
+
+    # Worktrees and linked checkouts stay out of the task repo. Platypus
+    # bootstrap appends its own runtime entries below these.
+    write_new "$d/.gitignore" <<'EOF'
+/repos/
+/.claude/settings.local.json
+EOF
+
+    if [ -d "$d/.git" ] ; then
+        say "task repo already initialized"
+    else
+        git -C "$d" init -q
+        say "initialized task repo"
+    fi
+
+    if [ -f "$d/platy.yaml" ] ; then
+        say "platypus project already initialized"
+    elif command -v platypus-mcp >/dev/null ; then
+        (cd "$d" && platypus-mcp bootstrap claude --init-project --project-name "$id" >/dev/null)
+        say "initialized platypus project $id"
+    else
+        say "platypus-mcp not found; skipped platypus setup"
+    fi
+
+    if git -C "$d" rev-parse -q --verify HEAD >/dev/null ; then
+        say "task repo already has commits"
+    else
+        git -C "$d" add -A
+        git -C "$d" commit -q -m "task new $id"
+        say "committed initial task files"
+    fi
+}
+
+cmd_add_repo() {
+    local id="" src="" branch="" link=0
+    while [ $# -gt 0 ] ; do
+        case "$1" in
+            --branch) branch=$2 ; shift 2 ;;
+            --link) link=1 ; shift ;;
+            -*) usage ;;
+            *)
+                if [ -z "$id" ] ; then id=$1
+                elif [ -z "$src" ] ; then src=$1
+                else usage ; fi
+                shift ;;
+        esac
+    done
+    [ -n "$src" ] || usage
+    local d
+    d=$(task_dir "$id")
+    [ -d "$src" ] || src="$(repos_root_of "$d")/$src"
+    [ -d "$src" ] || die "no repo at $src"
+    git -C "$src" rev-parse --git-dir >/dev/null 2>&1 || die "$src is not a git repo"
+    src=$(main_checkout "$src")
+
+    local name dest
+    name=$(basename "$src")
+    dest="$d/repos/$name"
+    mkdir -p "$d/repos"
+    if [ "$link" = 1 ] ; then
+        if [ -L "$dest" ] ; then
+            say "$name already linked"
+        else
+            [ ! -e "$dest" ] || die "$dest exists and is not a link"
+            ln -s "$src" "$dest"
+            say "linked $name -> $src"
+        fi
+        settings_add_dir "$d" "$src"
+    elif [ -e "$dest" ] ; then
+        [ ! -L "$dest" ] || die "$name is linked, not a worktree; drop it first"
+        [ "$(main_checkout "$dest" 2>/dev/null)" = "$src" ] || die "$dest exists and is not a worktree of $src"
+        say "$name already present on branch $(git -C "$dest" branch --show-current)"
+    else
+        git -C "$src" fetch -q origin
+        say "fetched origin in $src"
+        : "${branch:=$(default_branch "$d" "$id")}"
+        if git -C "$src" show-ref -q --verify "refs/heads/$branch" ; then
+            git -C "$src" worktree add -q "$dest" "$branch"
+            say "added worktree $name on existing branch $branch"
+        elif git -C "$src" show-ref -q --verify "refs/remotes/origin/$branch" ; then
+            git -C "$src" worktree add -q --track -b "$branch" "$dest" "origin/$branch"
+            say "added worktree $name on branch $branch tracking origin/$branch"
+        else
+            local base
+            base=$(origin_head "$src")
+            git -C "$src" worktree add -q --no-track -b "$branch" "$dest" "$base"
+            say "added worktree $name on new branch $branch from $base"
+        fi
+    fi
+    repos_add "$d" "$name"
+}
+
+cmd_drop_repo() {
+    [ $# -eq 2 ] || usage
+    local d name="$2" dest
+    d=$(task_dir "$1")
+    dest="$d/repos/$name"
+    if [ -L "$dest" ] ; then
+        local target
+        target=$(readlink "$dest")
+        rm "$dest"
+        say "removed link $name"
+        settings_remove_dir "$d" "$target"
+    elif [ -e "$dest" ] ; then
+        check_clean "$dest"
+        local src b
+        src=$(main_checkout "$dest")
+        b=$(git -C "$dest" branch --show-current)
+        git -C "$src" worktree remove "$dest"
+        say "removed worktree $name (branch $b kept in $src)"
+    else
+        say "$name not present"
+    fi
+    repos_remove "$d" "$name"
+}
+
+cmd_list() {
+    local f d id title last
+    printf '%-34s %-9s %-7s %-10s %-24s %s\n' ID TYPE STATUS LAST-LOG REPOS TITLE
+    for f in "$TASKS_ROOT"/*/task.org "$PERSONAL_TASKS_ROOT"/*/task.org ; do
+        [ -e "$f" ] || continue
+        d=$(dirname "$f")
+        id=$(basename "$d")
+        title=$(sed -n "s/^#+title: //p" "$f" | head -1)
+        title=${title#"$id: "}
+        last=$(grep -oE '^\*{4} [0-9]{4}-[0-9]{2}-[0-9]{2}' "$f" | tail -1 | cut -c6- || true)
+        printf '%-34s %-9s %-7s %-10s %-24s %s\n' "$id" "$(get_prop "$d" TYPE)" \
+            "$(get_prop "$d" STATUS)" "${last:--}" "$(get_prop "$d" REPOS)" "$title"
+    done
+}
+
+cmd_archive() {
+    [ $# -eq 1 ] || usage
+    local id="$1" d a r e
+    for r in "$TASKS_ROOT" "$PERSONAL_TASKS_ROOT" ; do
+        if [ ! -e "$r/$id" ] && [ -f "$r/.archive/$id/task.org" ] ; then
+            say "$id already archived in $r/.archive/$id"
+            return
+        fi
+    done
+    d=$(task_dir "$id")
+    r=$(dirname "$d")
+    a="$r/.archive/$id"
+    [ ! -e "$a" ] || die "$a already exists"
+    # Check every worktree before removing any.
+    for e in "$d"/repos/* ; do
+        if [ ! -L "$e" ] && [ -f "$e/.git" ] ; then check_clean "$e" ; fi
+    done
+    for e in "$d"/repos/* ; do
+        if [ -L "$e" ] ; then
+            rm "$e"
+            say "removed link $(basename "$e")"
+        elif [ -f "$e/.git" ] ; then
+            git -C "$(main_checkout "$e")" worktree remove "$e"
+            say "removed worktree $(basename "$e")"
+        fi
+    done
+    set_prop "$d" STATUS done
+    say "set :STATUS: done"
+    mkdir -p "$r/.archive"
+    mv "$d" "$a"
+    say "moved $id to $a"
+}
+
+cmd=${1:-}
+[ $# -eq 0 ] || shift
+case "$cmd" in
+    new) cmd_new "$@" ;;
+    add-repo) cmd_add_repo "$@" ;;
+    drop-repo) cmd_drop_repo "$@" ;;
+    list) cmd_list ;;
+    archive) cmd_archive "$@" ;;
+    *) usage ;;
+esac

@@ -1,0 +1,45 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr status *)",
+      "Bash(gh run view *)",
+      "Bash(gh run list *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh repo view *)",
+      "Bash(task list)",
+      "mcp__claude_ai_Linear__get_*",
+      "mcp__claude_ai_Linear__list_*",
+      "mcp__claude_ai_Linear__search_documentation",
+      "mcp__claude_ai_Slack__slack_read_*",
+      "mcp__claude_ai_Slack__slack_search_*",
+      "mcp__claude_ai_Slack__slack_list_*",
+      "mcp__claude_ai_incident_io__*_list",
+      "mcp__claude_ai_incident_io__*_show",
+      "mcp__claude_ai_Datadog__search_*",
+      "mcp__claude_ai_Datadog__get_*",
+      "mcp__claude_ai_Datadog__list_*",
+      "mcp__claude_ai_Datadog__analyze_*",
+      "mcp__claude_ai_Datadog__aggregate_*",
+      "mcp__claude_ai_Datadog__load_datadog_skill",
+      "mcp__claude_ai_CircleCI__get_*",
+      "mcp__claude_ai_CircleCI__list_*"
+    ],
+    "ask": [
+      "mcp__platypus__complete_backlog_item",
+      "mcp__platypus__complete_worker_task",
+      "mcp__platypus__finish_work",
+      "mcp__platypus-task-manager__complete_backlog_item",
+      "mcp__platypus-task-manager__complete_worker_task",
+      "mcp__platypus-task-manager__finish_work"
+    ],
+    "deny": [
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}

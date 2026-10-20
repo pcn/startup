@@ -1,0 +1,13 @@
+[Unit]
+Description=Open a URL from the nlf container in the host browser
+
+[Service]
+ExecStart=%h/dvcs/pcn/startup/emacs/bin/host-bridge-open
+# Container logins are work logins: open them in the Work Firefox profile, not
+# whichever profile was used last. Empty means use xdg-open.
+Environment=HOST_BRIDGE_FIREFOX_PROFILE=Work
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+# This connection may be what starts the browser; don't kill it when the handler exits.
+KillMode=process

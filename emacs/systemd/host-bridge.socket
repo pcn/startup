@@ -1,0 +1,15 @@
+[Unit]
+Description=Host bridge for the nlf container: open URLs in the host browser
+
+[Socket]
+# Inside the already-mounted work directory, so the container sees it at
+# /home/pcn/netlify/.host-bridge/open.sock without a new mount.
+ListenStream=%h/dvcs/netlify/.host-bridge/open.sock
+SocketMode=0600
+DirectoryMode=0700
+Accept=yes
+# The container can't see the startup repo, so keep its client next to the socket.
+ExecStartPre=/usr/bin/install -D -m 755 %h/dvcs/pcn/startup/emacs/bin/host-open %h/dvcs/netlify/.host-bridge/host-open
+
+[Install]
+WantedBy=sockets.target

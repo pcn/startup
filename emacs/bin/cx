@@ -1,0 +1,57 @@
+#!/bin/bash
+# cx: run a command inside the persistent nlf dev container.
+#
+#   cx                      interactive login shell in the container
+#   cx gcloud ... / cx aws ...
+#
+# ~/dvcs/netlify is mounted at /home/pcn/netlify in the container, so the
+# current directory and any argument under it are translated to the
+# container path. Commands run in a login shell so asdf shims are on PATH.
+
+set -eu -o pipefail
+
+CONTAINER=${CX_CONTAINER:-nlf}
+HOST_ROOT="$HOME/dvcs/netlify"
+CTR_ROOT="/home/pcn/netlify"
+CTR_HOME="/home/pcn"
+
+state=$(docker inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null || true)
+if [ "$state" = "false" ] ; then
+    echo "cx: starting stopped container $CONTAINER" >&2
+    docker start "$CONTAINER" >/dev/null
+elif [ "$state" != "true" ] ; then
+    echo "cx: no container named $CONTAINER; create it with $HOST_ROOT/dockerized/run.sh" >&2
+    exit 125
+fi
+
+translate() {
+    local p="$1"
+    echo "${p//$HOST_ROOT/$CTR_ROOT}"
+}
+
+cwd=$(pwd -P)
+case "$cwd" in
+    "$HOST_ROOT"|"$HOST_ROOT"/*) workdir=$(translate "$cwd") ;;
+    *) workdir="$CTR_HOME" ;;
+esac
+
+args=()
+for a in "$@" ; do
+    args+=("$(translate "$a")")
+done
+
+# Browser-based auth (gcloud, aws sso, Okta) opens the host browser through the
+# host-bridge socket (startup/emacs/systemd/host-bridge.socket). gcloud only
+# launches a browser on Linux when a display variable is set; nothing in the
+# container uses Mir, so MIR_SOCKET satisfies that check without side effects.
+flags=(-i -w "$workdir"
+       -e BROWSER="$CTR_ROOT/.host-bridge/host-open"
+       -e MIR_SOCKET=host-bridge)
+if [ -t 0 ] && [ -t 1 ] ; then
+    flags+=(-t)
+fi
+
+if [ ${#args[@]} -eq 0 ] ; then
+    exec docker exec "${flags[@]}" "$CONTAINER" bash -l
+fi
+exec docker exec "${flags[@]}" "$CONTAINER" bash -lc '"$@"' cx "${args[@]}"

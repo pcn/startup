@@ -1,0 +1,40 @@
+#!/bin/bash
+# host-bridge-open: open one URL from the nlf container in the host browser.
+#
+# Run once per connection by host-bridge@.service (socket activation): the URL
+# arrives on stdin, and the reply ("ok" or "refused: ...") goes back on stdout.
+# Only http(s) URLs are opened, in the Firefox profile named by
+# HOST_BRIDGE_FIREFOX_PROFILE (set in the service), or with xdg-open if unset. The journal gets the URL without its query
+# string, since that is where auth codes and state travel.
+
+set -u
+
+if ! IFS= read -r -t 5 url ; then
+    echo "refused: no URL"
+    exit 1
+fi
+url=${url%$'\r'}
+
+case "$url" in
+    http://*|https://*) ;;
+    *)
+        echo "refused: only http(s) URLs"
+        echo "host-bridge: refused a non-http(s) URL" >&2
+        exit 1 ;;
+esac
+if [[ "$url" =~ [[:space:][:cntrl:]] ]] ; then
+    echo "refused: URL contains whitespace or control characters"
+    exit 1
+fi
+
+# With a profile set, the URL goes to that Firefox profile's instance (started
+# if needed) rather than to whichever browser window was used last.
+profile=${HOST_BRIDGE_FIREFOX_PROFILE:-}
+if [ -n "$profile" ] ; then
+    echo "host-bridge: opening ${url%%\?*} in Firefox profile $profile" >&2
+    firefox -P "$profile" --new-tab "$url" >/dev/null 2>&1 < /dev/null &
+else
+    echo "host-bridge: opening ${url%%\?*}" >&2
+    xdg-open "$url" >/dev/null 2>&1 < /dev/null &
+fi
+echo ok

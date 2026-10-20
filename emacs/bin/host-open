@@ -1,0 +1,29 @@
+#!/usr/bin/python3
+"""host-open: open a URL in the host's browser from inside the nlf container.
+
+cx sets BROWSER to this script. It sends the URL to the host-bridge socket
+next to it (~/dvcs/netlify/.host-bridge/open.sock on the host), where
+host-bridge-open runs xdg-open. The host-bridge socket unit installs this
+copy there; the source is startup/emacs/bin/host-open.
+"""
+import os
+import socket
+import sys
+
+SOCK = os.path.join(os.path.dirname(os.path.realpath(__file__)), "open.sock")
+
+if len(sys.argv) != 2:
+    sys.exit("usage: host-open URL")
+
+try:
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+        s.settimeout(10)
+        s.connect(SOCK)
+        s.sendall(sys.argv[1].encode() + b"\n")
+        s.shutdown(socket.SHUT_WR)
+        reply = s.recv(256).decode().strip()
+except OSError as e:
+    sys.exit(f"host-open: cannot reach the host bridge at {SOCK}: {e}")
+
+if reply != "ok":
+    sys.exit(f"host-open: {reply}")
