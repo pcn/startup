@@ -1,5 +1,5 @@
 ;;; package --- Summary
-;;; Settings for using github copilot and other ai coding assist tools
+;;; Settings for using AI copilots/LLM code assists. Started with github copilot
 
 ;;; Commentary:
 ;;; Use a module to LLMs in emacs
@@ -66,10 +66,16 @@
 ;;               "TAB" 'my/copilot-complete-or-accept)))
 
 
-(elpaca (eat :host codeberg :repo "akib/emacs-eat" :wait t)
-  (use-package eat
+;; (elpaca (eat :host codeberg :repo "akib/emacs-eat" :wait t)
+;;   (use-package eat
+;;     :hook
+;;     (eat-mode . (lambda () (display-line-numbers-mode -1)))))
+
+(elpaca (ghostel :host codeberg :repo "dakra/ghostel" :wait t)
+  (use-package ghostel
     :hook
-    (eat-mode . (lambda () (display-line-numbers-mode -1)))))
+    (ghostel-mode . (lambda () (display-line-numbers-mode -1)))))
+
 
 
 ;; When using this in a terminal, C-c C-e invokes the emacs-eat terminal's
@@ -81,7 +87,7 @@
     :config
     (claude-code-ide-emacs-tools-setup)
     (setq claude-code-ide-cli-path (expand-file-name "~/.local/bin/claude"))
-    (setq claude-code-ide-terminal-backend 'eat)
+    (setq claude-code-ide-terminal-backend 'ghostel)
     (setq claude-code-ide-focus-claude-after-ediff nil)
     ;; Theoretically keep ediff control buffer in the same frmae
     (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -123,8 +129,10 @@ restarting the CLI process with a fresh terminal state."
       "Start Claude Code IDE using LM Studio at localhost:1234."
       (interactive)
       (let ((process-environment (append
-                                   '("ANTHROPIC_BASE_URL=http://localhost:1234"
-                                     "ANTHROPIC_API_KEY=sk-lm-y8VnzGyn:0YIvaW7JEZPyz7dT2yxg")
+                                   (list "ANTHROPIC_BASE_URL=http://localhost:1234"
+                                         (concat "ANTHROPIC_API_KEY="
+                                                 (or (getenv "LMSTUDIO_API_KEY")
+                                                     (user-error "Set LMSTUDIO_API_KEY first"))))
                                    process-environment))
             (claude-code-ide-cli-extra-flags "--model google/gemma-4-26b-a4b"))
         (call-interactively #'claude-code-ide)))

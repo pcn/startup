@@ -24,6 +24,8 @@
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   ;; (setq vertico-cycle t)
   (savehist-mode 1)
+  ;; Recently chosen first, then alphabetical (the default also sorts by length)
+  (setq vertico-sort-function #'vertico-sort-history-alpha)
   (defun crm-indicator (args)
     (cons (format "[CRM%s] %s"
                   (replace-regexp-in-string

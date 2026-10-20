@@ -35,8 +35,9 @@
   ;; `xref-find-definitions', which eglot backs with gopls. It used to be bound
   ;; to `godef-jump' both here and in my-go-mode-hook, which shadowed eglot's
   ;; navigation with a tool that is not installed.
-  (:keymaps '(go-mode-map go-ts-mode-map)
-            "M-," 'compile)))
+  ;; (:keymaps '(go-mode-map go-ts-mode-map)
+  ;;           "M-," 'compile)
+  ))
 
 ;; Hook these onto BOTH go-mode and go-ts-mode: treesit-auto remaps go-mode ->
 ;; go-ts-mode now that the Go grammar is installed, and go-mode-hook then never

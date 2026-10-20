@@ -90,6 +90,7 @@
 ;; ;; (load "codeium.el")
 (load "copilot-settings.el");; 
 (load "perspective-settings") ;; Workspace management
+(load "task-workflow") ;; Task workspaces (after perspective-settings)
 
 (put 'narrow-to-region 'disabled nil)
 (elpaca-process-queues)

@@ -39,6 +39,27 @@ cd ~/.emacs.d
 ln -s ~/dvcs/pcn/startup/emacs/{early-init.el,init.el,settings} .
 ```
 
+### Claude Code Setup
+```bash
+# Central Claude Code rules (apply in every repo and task)
+ln -sfn ~/dvcs/pcn/startup/emacs/claude/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sfn ~/dvcs/pcn/startup/emacs/claude/rules ~/.claude/rules
+ln -sfn ~/dvcs/pcn/startup/emacs/claude/commands ~/.claude/commands
+
+# cx: run cloud CLIs (gcloud, aws, kubectl, okta) inside the nlf dev container
+ln -sfn ~/dvcs/pcn/startup/emacs/bin/cx ~/bin/cx
+
+# host-bridge: browser logins inside the nlf container (via cx) open the host browser
+mkdir -p ~/.config/systemd/user
+ln -sfn ~/dvcs/pcn/startup/emacs/systemd/host-bridge.socket ~/.config/systemd/user/
+ln -sfn ~/dvcs/pcn/startup/emacs/systemd/host-bridge@.service ~/.config/systemd/user/
+systemctl --user daemon-reload && systemctl --user enable --now host-bridge.socket
+
+# task: create and manage task workspaces under ~/dvcs/netlify/tasks (personal: ~/dvcs/pcn/tasks)
+ln -sfn ~/dvcs/pcn/startup/emacs/bin/task ~/bin/task
+```
+The task-centric workflow these support is described in `emacs/new-workflow.md`.
+
 ### Docker Installation
 ```bash
 # Full Docker CE setup (from docker/README.md)
